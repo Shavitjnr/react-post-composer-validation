@@ -13,17 +13,17 @@ const MEDIA_KEY = 'csv_media_database';
 
 // Initial Workspaces CSV
 export const DEFAULT_WORKSPACES_CSV = `ID,Name,Slug,Role,Plan,CreatedAt
-ws_1,"Hostego","hostego","Owner","PROFESSIONAL","2026-09-29 08:00:00"
-ws_2,"Personal Brand","personal-brand","Owner","STARTER","2026-09-29 08:30:00"
+ws_1,"Personal Brand","personal-brand","Owner","PROFESSIONAL","2026-09-29 08:00:00"
+ws_2,"Creator Lab","creator-lab","Owner","STARTER","2026-09-29 08:30:00"
 ws_3,"Client Alpha","client-alpha","Manager","BUSINESS","2026-09-29 09:00:00"`;
 
 // Initial Social Accounts CSV (Zero credentials leaked; tokenPreview only)
 export const DEFAULT_SOCIAL_ACCOUNTS_CSV = `ID,WorkspaceId,Platform,Username,DisplayName,Status,Followers,TokenPreview,ConnectedAt
-acc_1,"ws_1","Twitter","@hostego_hq","Hostego Official","Connected","38200","2X98••••••••8340","2026-09-29 09:00:00"
-acc_2,"ws_1","LinkedIn","@hostego-inc","Hostego Inc.","Connected","14890","AQW7••••••••9102","2026-09-29 09:15:00"
-acc_3,"ws_1","Instagram","@hostego_official","Hostego Brand","Connected","24500","EAAJ••••••••1823","2026-09-29 09:20:00"
-acc_4,"ws_1","Facebook","@hostego.technologies","Hostego Page","Connected","18200","EAAK••••••••3912","2026-09-29 09:25:00"
-acc_5,"ws_1","YouTube","@HostegoMedia","Hostego Media Official","Connected","52400","ya29••••••••0918","2026-09-29 09:30:00"
+acc_1,"ws_1","Twitter","@personalbrand_hq","Personal Brand Official","Connected","38200","2X98••••••••8340","2026-09-29 09:00:00"
+acc_2,"ws_1","LinkedIn","@personalbrand","Personal Brand","Connected","14890","AQW7••••••••9102","2026-09-29 09:15:00"
+acc_3,"ws_1","Instagram","@personalbrand_official","Personal Brand","Connected","24500","EAAJ••••••••1823","2026-09-29 09:20:00"
+acc_4,"ws_1","Facebook","@personalbrand.hq","Personal Brand Page","Connected","18200","EAAK••••••••3912","2026-09-29 09:25:00"
+acc_5,"ws_1","YouTube","@PersonalBrandMedia","Personal Brand Channel","Connected","52400","ya29••••••••0918","2026-09-29 09:30:00"
 acc_6,"ws_2","Twitter","@shavitdaloutra","Shavit Daloutra","Connected","8400","4B71••••••••1928","2026-09-29 10:00:00"`;
 
 // Initial Campaigns CSV
@@ -50,9 +50,13 @@ export const csvRepository = {
   // WORKSPACES
   getWorkspacesCSV: () => {
     let raw = localStorage.getItem(WORKSPACES_KEY);
-    if (!raw) {
-      localStorage.setItem(WORKSPACES_KEY, DEFAULT_WORKSPACES_CSV);
-      raw = DEFAULT_WORKSPACES_CSV;
+    if (!raw || raw.includes('Hostego') || raw.includes('hostego')) {
+      if (raw && (raw.includes('Hostego') || raw.includes('hostego'))) {
+        raw = raw.replace(/Hostego/g, 'Personal Brand').replace(/hostego/g, 'personal-brand');
+      } else {
+        raw = DEFAULT_WORKSPACES_CSV;
+      }
+      localStorage.setItem(WORKSPACES_KEY, raw);
     }
     return raw;
   },
@@ -72,9 +76,13 @@ export const csvRepository = {
   // SOCIAL ACCOUNTS
   getSocialAccountsCSV: () => {
     let raw = localStorage.getItem(SOCIAL_ACCOUNTS_KEY);
-    if (!raw) {
-      localStorage.setItem(SOCIAL_ACCOUNTS_KEY, DEFAULT_SOCIAL_ACCOUNTS_CSV);
-      raw = DEFAULT_SOCIAL_ACCOUNTS_CSV;
+    if (!raw || raw.includes('Hostego') || raw.includes('hostego')) {
+      if (raw && (raw.includes('Hostego') || raw.includes('hostego'))) {
+        raw = raw.replace(/Hostego/g, 'Personal Brand').replace(/hostego/gi, 'personalbrand');
+      } else {
+        raw = DEFAULT_SOCIAL_ACCOUNTS_CSV;
+      }
+      localStorage.setItem(SOCIAL_ACCOUNTS_KEY, raw);
     }
     return raw;
   },

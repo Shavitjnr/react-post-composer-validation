@@ -18,12 +18,12 @@ export class MetaProvider extends BaseSocialProvider {
       return {
         success: true,
         isSimulated: true,
-        message: `Connected ${this.displayName} (@hostego_${this.subType.toLowerCase()}) in Demo Mode.`,
+        message: `Connected ${this.displayName} (@personalbrand_${this.subType.toLowerCase()}) in Demo Mode.`,
         account: {
           id: `meta_${this.subType.toLowerCase()}_demo`,
           platform: this.subType,
-          username: `@hostego_${this.subType.toLowerCase()}`,
-          displayName: `Hostego ${this.displayName}`,
+          username: `@personalbrand_${this.subType.toLowerCase()}`,
+          displayName: `Personal Brand ${this.displayName}`,
           avatarUrl: `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=80`,
           status: 'Connected',
           connectedAt: new Date().toISOString(),

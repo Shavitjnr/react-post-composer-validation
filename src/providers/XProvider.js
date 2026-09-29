@@ -16,12 +16,12 @@ export class XProvider extends BaseSocialProvider {
       return {
         success: true,
         isSimulated: true,
-        message: 'Connected X account (@hostego_hq) in Demo Mode.',
+        message: 'Connected X account (@personalbrand_hq) in Demo Mode.',
         account: {
           id: 'x_demo_account',
           platform: 'Twitter',
-          username: '@hostego_hq',
-          displayName: 'Hostego Official',
+          username: '@personalbrand_hq',
+          displayName: 'Personal Brand Official',
           avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80',
           status: 'Connected',
           connectedAt: new Date().toISOString(),

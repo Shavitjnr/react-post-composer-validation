@@ -214,7 +214,7 @@ export function TopNavbar({
           title="Active Workspace"
         >
           <Building2 className="w-3.5 h-3.5 text-primary" />
-          <span className="ws-title-snippet">{activeWorkspace?.Name || 'Hostego'}</span>
+          <span className="ws-title-snippet">{activeWorkspace?.Name || 'Personal Brand'}</span>
           <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
         </button>
       </div>

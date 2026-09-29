@@ -280,7 +280,7 @@ export function LandingPage({ onGetStartedFree, onOpenAuth, onSelectPaidPlan }) 
               <Layers className="w-5 h-5 text-primary" />
             </div>
             <h4>Multi-Tenant Workspaces</h4>
-            <p>Isolate posts, drafts, media, and analytics across brands (`Hostego`, `Personal Brand`, `Client Acuity`) with instant switching.</p>
+            <p>Isolate posts, drafts, media, and analytics across brands (`Personal Brand`, `Acuity Growth`, `Creator Lab`) with instant switching.</p>
           </div>
 
           <div className="feature-card">

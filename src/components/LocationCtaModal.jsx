@@ -66,7 +66,7 @@ export function LocationCtaModal({ isOpen, onClose, mode, onApply, showToast }) 
             <input
               type="text"
               required
-              placeholder={mode === 'location' ? 'e.g. San Francisco, CA' : 'https://hostego.com/product'}
+              placeholder={mode === 'location' ? 'e.g. San Francisco, CA' : 'https://personalbrand.io/product'}
               value={val}
               onChange={(e) => setVal(e.target.value)}
               className="modal-input"

@@ -16,12 +16,12 @@ export class LinkedInProvider extends BaseSocialProvider {
       return {
         success: true,
         isSimulated: true,
-        message: 'Connected LinkedIn (@hostego-inc) in Demo Mode.',
+        message: 'Connected LinkedIn (@personalbrand-hq) in Demo Mode.',
         account: {
           id: 'linkedin_org_demo',
           platform: 'LinkedIn',
-          username: '@hostego-inc',
-          displayName: 'Hostego Technologies Inc.',
+          username: '@personalbrand-hq',
+          displayName: 'Personal Brand Inc.',
           avatarUrl: 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?w=100&auto=format&fit=crop&q=80',
           status: 'Connected',
           connectedAt: new Date().toISOString(),

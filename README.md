@@ -13,7 +13,7 @@ Built with **React, Vite, JavaScript**, and structured around a dual-tier storag
 Post Composer Pro bridges the gap between individual post creation and enterprise social operations:
 
 - **Unified Multi-Channel Publishing:** Support for **Instagram, Facebook, LinkedIn, X (Twitter), and YouTube** (TikTok strictly excluded).
-- **Workspace Isolation:** True multi-tenant workspace architecture (e.g. `Hostego`, `Personal Brand`, `Client Alpha`) with isolated posts, assets, campaigns, and team members.
+- **Workspace Isolation:** True multi-tenant workspace architecture (e.g. `Personal Brand`, `Acuity Growth`, `Client Alpha`) with isolated posts, assets, campaigns, and team members.
 - **Enterprise Approval Workflow:** Creator drafts $\rightarrow$ Submit for review $\rightarrow$ Manager approval $\rightarrow$ Automated scheduling $\rightarrow$ Publication.
 - **Controlled Character Validation:** Real-time character limits enforcement (X: 280, LinkedIn: 3000, Instagram: 2200, Facebook: 5000, YouTube: 5000).
 - **Zero-Budget Demo Mode:** Complete simulation of account connection, scheduling, publishing queue, and analytics telemetry without requiring paid external API credentials.
@@ -102,7 +102,7 @@ Post Composer Pro bridges the gap between individual post creation and enterpris
 - Token preview displays sanitized `••••••••••••••••` mask with zero client-side credential exposure.
 
 ### F. Multi-Workspace & Team Governance
-- Multi-tenant workspace switcher (`Hostego`, `Personal Brand`, `Client Alpha`).
+- Multi-tenant workspace switcher (`Personal Brand`, `Acuity Growth`, `Client Alpha`).
 - Role-Based Access Control (RBAC): `Owner`, `Admin`, `Manager`, `Editor`, `Creator`, `Viewer`.
 - Invites and team member capacity enforced against active plan limits.
 

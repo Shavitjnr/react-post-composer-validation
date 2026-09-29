@@ -169,7 +169,7 @@ export function PostComposer({
         <div className="composer-card-header">
           <div className="header-meta-flex">
             <div className="header-pill">
-              Workspace: {activeWorkspace?.Name || 'Hostego'}
+              Workspace: {activeWorkspace?.Name || 'Personal Brand'}
             </div>
             <div className="connection-status-pill">
               <span className={`status-dot ${isPlatformConnected ? 'online' : 'demo'}`} />

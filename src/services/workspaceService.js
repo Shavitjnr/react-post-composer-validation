@@ -27,8 +27,8 @@ export const workspaceService = {
     const found = workspaces.find((w) => w.ID === activeId);
     return found || workspaces[0] || {
       ID: 'ws_1',
-      Name: 'Hostego',
-      Slug: 'hostego',
+      Name: 'Personal Brand',
+      Slug: 'personal-brand',
       Role: 'Owner',
       Plan: 'PROFESSIONAL',
     };

@@ -70,7 +70,7 @@ export function Dashboard({
         <div>
           <div className="hero-tag">
             <Sparkles className="w-3.5 h-3.5 text-primary" />
-            <span>Workspace: {activeWorkspace?.Name || 'Hostego'}</span>
+            <span>Workspace: {activeWorkspace?.Name || 'Personal Brand'}</span>
           </div>
           <h1 className="hero-title">Good morning, {firstName}</h1>
           <p className="hero-subtitle">

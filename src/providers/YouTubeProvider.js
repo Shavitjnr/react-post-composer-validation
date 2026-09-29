@@ -16,12 +16,12 @@ export class YouTubeProvider extends BaseSocialProvider {
       return {
         success: true,
         isSimulated: true,
-        message: 'Connected YouTube Channel (Hostego Media) in Demo Mode.',
+        message: 'Connected YouTube Channel (Personal Brand Channel) in Demo Mode.',
         account: {
           id: 'youtube_demo_channel',
           platform: 'YouTube',
-          username: '@HostegoMedia',
-          displayName: 'Hostego Media Official',
+          username: '@PersonalBrandMedia',
+          displayName: 'Personal Brand Official',
           avatarUrl: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&auto=format&fit=crop&q=80',
           status: 'Connected',
           connectedAt: new Date().toISOString(),

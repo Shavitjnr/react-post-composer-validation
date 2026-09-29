@@ -23,7 +23,7 @@ import { csvStorage } from '../utils/csvStorage';
 import { adminService } from '../services/adminService';
 
 export function WorkspaceSettingsView({ activeWorkspace, showToast }) {
-  const [workspaceName, setWorkspaceName] = useState(activeWorkspace?.Name || 'Hostego Media Lab');
+  const [workspaceName, setWorkspaceName] = useState(activeWorkspace?.Name || 'Personal Brand');
   const [timezone, setTimezone] = useState('Asia/Kolkata');
   const [requireApproval, setRequireApproval] = useState(true);
   const [autoNotify, setAutoNotify] = useState(true);
@@ -139,7 +139,7 @@ export function WorkspaceSettingsView({ activeWorkspace, showToast }) {
                 <label>Workspace Identifier (UID)</label>
                 <input
                   type="text"
-                  value={activeWorkspace?.ID || 'ws_default_hostego'}
+                  value={activeWorkspace?.ID || 'ws_default_personal_brand'}
                   disabled
                   className="settings-input disabled-input"
                 />

@@ -62,7 +62,7 @@ export function Sidebar({
           <div className="ws-btn-left">
             <Building2 className="w-4 h-4 text-primary" />
             <div className="ws-name-col">
-              <span className="ws-label-title">{activeWorkspace?.Name || 'Hostego'}</span>
+              <span className="ws-label-title">{activeWorkspace?.Name || 'Personal Brand'}</span>
               <span className="ws-role-tag">{activeWorkspace?.Role || 'Owner'}</span>
             </div>
           </div>
