@@ -220,8 +220,6 @@ function App({ hasClerkConfigured = false }) {
               onNavigate={(tab) => setActiveTab(tab)}
               onOpenMediaUpload={() => setActiveTab('media')}
               showToast={showToast}
-              hasClerkConfigured={hasClerkConfigured}
-              onNavigateToHome={() => navigate('home')}
               currentUser={effectiveUser}
               onLogout={handleLogout}
             />
@@ -230,7 +228,7 @@ function App({ hasClerkConfigured = false }) {
             <main className="saas-page-content-wrapper">
               {activeTab === 'dashboard' && (
                 <Dashboard
-                  currentUser={currentUser}
+                  currentUser={effectiveUser}
                   activeWorkspace={activeWorkspace}
                   onNavigateToComposer={() => setActiveTab('composer')}
                   onNavigateToTab={(tab) => setActiveTab(tab)}
@@ -240,7 +238,7 @@ function App({ hasClerkConfigured = false }) {
 
               {activeTab === 'composer' && (
                 <PostComposer
-                  currentUser={currentUser}
+                  currentUser={effectiveUser}
                   activeWorkspace={activeWorkspace}
                   showToast={showToast}
                   onPostCreated={() => {}}

@@ -436,7 +436,7 @@ export function PostComposer({
         <PostPreview
           platform={platform}
           content={content}
-          authorName={currentUser?.name || 'Shavit Daloutra'}
+          authorName={currentUser?.name || currentUser?.username || 'Personal Brand'}
           mediaUrl={attachedMedia?.Url || null}
         />
       </div>

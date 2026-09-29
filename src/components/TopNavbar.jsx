@@ -15,8 +15,6 @@ import {
   LogOut
 } from 'lucide-react';
 import { notificationService } from '../services/notificationService';
-import { ClerkNavControls } from './ClerkAuthControls';
-import { Home } from 'lucide-react';
 
 export function TopNavbar({
   activeWorkspace,
@@ -24,8 +22,6 @@ export function TopNavbar({
   onNavigate,
   onOpenMediaUpload,
   showToast,
-  hasClerkConfigured,
-  onNavigateToHome,
   currentUser,
   onLogout
 }) {
@@ -179,33 +175,6 @@ export function TopNavbar({
           )}
         </div>
 
-        {/* Route Quick Switchers */}
-        <button
-          type="button"
-          onClick={onNavigateToHome}
-          className="top-home-pill"
-          title="Return to Public Homepage"
-        >
-          <Home className="w-3.5 h-3.5" />
-          <span>Home</span>
-        </button>
-
-        {/* Clerk Authentication Controls */}
-        <ClerkNavControls hasClerkConfigured={hasClerkConfigured} />
-
-        {/* Dedicated Sign Out / Log Out Button */}
-        {onLogout && (
-          <button
-            type="button"
-            onClick={onLogout}
-            className="top-logout-btn"
-            title="Sign out of active session"
-          >
-            <LogOut className="w-3.5 h-3.5 text-rose-500" />
-            <span>Sign Out</span>
-          </button>
-        )}
-
         {/* Workspace Switcher Pill */}
         <button
           type="button"
@@ -217,6 +186,37 @@ export function TopNavbar({
           <span className="ws-title-snippet">{activeWorkspace?.Name || 'Personal Brand'}</span>
           <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
         </button>
+
+        {/* User Profile Option with Log Out (Only Profile & Log Out shown after login) */}
+        <div className="top-user-profile-cluster">
+          <div className="top-profile-badge">
+            <div className="top-profile-avatar-circle">
+              {currentUser?.name
+                ? currentUser.name.slice(0, 2).toUpperCase()
+                : (currentUser?.username?.slice(0, 2).toUpperCase() || 'PB')}
+            </div>
+            <div className="top-profile-names">
+              <span className="top-profile-name">
+                {currentUser?.name || currentUser?.username || 'Personal Brand'}
+              </span>
+              {currentUser?.email && (
+                <span className="top-profile-email">{currentUser.email}</span>
+              )}
+            </div>
+          </div>
+
+          {onLogout && (
+            <button
+              type="button"
+              onClick={onLogout}
+              className="top-logout-btn"
+              title="Log out of active session"
+            >
+              <LogOut className="w-3.5 h-3.5 text-rose-500" />
+              <span>Log Out</span>
+            </button>
+          )}
+        </div>
       </div>
     </header>
   );

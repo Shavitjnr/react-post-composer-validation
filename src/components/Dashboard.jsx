@@ -61,7 +61,7 @@ export function Dashboard({
     showToast(`Published scheduled post for ${post.Platform} in Demo Mode!`, 'success');
   };
 
-  const firstName = currentUser?.name ? currentUser.name.split(' ')[0] : 'Shavit';
+  const firstName = currentUser?.name ? currentUser.name.split(' ')[0] : (currentUser?.username || 'Creator');
 
   return (
     <div className="dashboard-container">

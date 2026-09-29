@@ -245,10 +245,10 @@ export function LandingPage({ onGetStartedFree, onOpenAuth, onSelectPaidPlan }) 
               </div>
               <div className="mockup-body-area">
                 <div className="mockup-user-row">
-                  <div className="mockup-avatar">SD</div>
+                  <div className="mockup-avatar">PB</div>
                   <div>
-                    <strong>Shavit Daloutra</strong>
-                    <span className="mockup-handle">@shavitdaloutra</span>
+                    <strong>Personal Brand</strong>
+                    <span className="mockup-handle">@personalbrand</span>
                   </div>
                 </div>
                 <p className="mockup-text-preview">{demoText || 'Live preview text...'}</p>
