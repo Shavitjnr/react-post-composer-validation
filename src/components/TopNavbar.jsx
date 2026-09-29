@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { notificationService } from '../services/notificationService';
 import { ClerkNavControls } from './ClerkAuthControls';
-import { Home, ShieldCheck } from 'lucide-react';
+import { Home } from 'lucide-react';
 
 export function TopNavbar({
   activeWorkspace,
@@ -26,8 +26,6 @@ export function TopNavbar({
   showToast,
   hasClerkConfigured,
   onNavigateToHome,
-  onNavigateToAdmin,
-  isSuperAdmin = false,
   currentUser,
   onLogout
 }) {
@@ -191,19 +189,6 @@ export function TopNavbar({
           <Home className="w-3.5 h-3.5" />
           <span>Home</span>
         </button>
-
-        {/* Super Admin Access Pill - STRICTLY guarded for Super Admin only */}
-        {isSuperAdmin && (
-          <button
-            type="button"
-            onClick={onNavigateToAdmin}
-            className="top-admin-pill"
-            title="Super Admin Dashboard (Master Authority)"
-          >
-            <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
-            <span>Super Admin</span>
-          </button>
-        )}
 
         {/* Clerk Authentication Controls */}
         <ClerkNavControls hasClerkConfigured={hasClerkConfigured} />

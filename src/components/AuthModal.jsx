@@ -78,7 +78,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, showToast }) {
               onClick={() => handleFillDemo('daloutrashavit@gmail.com', 'shavitdaloutra')}
               className="demo-pill"
             >
-              daloutrashavit@gmail.com (Super Admin)
+              daloutrashavit@gmail.com
             </button>
             <button
               type="button"

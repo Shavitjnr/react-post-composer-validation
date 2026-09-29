@@ -222,8 +222,6 @@ function App({ hasClerkConfigured = false }) {
               showToast={showToast}
               hasClerkConfigured={hasClerkConfigured}
               onNavigateToHome={() => navigate('home')}
-              onNavigateToAdmin={() => navigate('admin')}
-              isSuperAdmin={isUserSuperAdmin}
               currentUser={effectiveUser}
               onLogout={handleLogout}
             />

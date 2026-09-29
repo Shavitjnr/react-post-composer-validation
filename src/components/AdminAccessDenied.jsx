@@ -90,10 +90,10 @@ export function AdminAccessDenied({
             type="button"
             onClick={onOpenAuth}
             className="btn-denied-secondary"
-            title="Switch or log into Super Admin account"
+            title="Switch user account"
           >
             <LogIn className="w-4 h-4" />
-            <span>Switch / Login as Admin</span>
+            <span>Switch / Sign In</span>
           </button>
 
           <button
