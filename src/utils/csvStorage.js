@@ -170,6 +170,38 @@ export const csvStorage = {
     return { success: true, user: session };
   },
 
+  addUser: (name, email, password, role = 'Contributor') => {
+    const users = csvStorage.getUsers();
+    if (users.some((u) => u.Email.toLowerCase() === email.trim().toLowerCase())) {
+      return { success: false, error: 'User with this email already exists in users.csv' };
+    }
+
+    const newUser = {
+      ID: `usr_${Date.now().toString().slice(-4)}_${Math.floor(Math.random() * 900 + 100)}`,
+      Name: name.trim(),
+      Email: email.trim().toLowerCase(),
+      Password: password,
+      Role: role || 'Contributor',
+      CreatedAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
+    };
+
+    users.push(newUser);
+    const updatedCSV = toCSV(users, ['ID', 'Name', 'Email', 'Password', 'Role', 'CreatedAt']);
+    localStorage.setItem(USERS_KEY, updatedCSV);
+    return { success: true, user: newUser };
+  },
+
+  deleteUser: (id) => {
+    const users = csvStorage.getUsers();
+    if (users.length <= 1) {
+      return { success: false, error: 'Cannot delete the only remaining user in the CSV database' };
+    }
+    const filtered = users.filter((u) => u.ID !== id);
+    const updatedCSV = toCSV(filtered, ['ID', 'Name', 'Email', 'Password', 'Role', 'CreatedAt']);
+    localStorage.setItem(USERS_KEY, updatedCSV);
+    return { success: true };
+  },
+
   getActiveUser: () => {
     const raw = localStorage.getItem(ACTIVE_USER_KEY);
     if (raw) {
