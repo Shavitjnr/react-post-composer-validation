@@ -1,14 +1,13 @@
-# Dependencies
+# Node dependencies
 node_modules/
 **/node_modules/
 
-# Production Build
+# Production builds
 dist/
 **/dist/
 dist-ssr/
 
-# Environment and IDE
-.env
+# Local env & IDE
 .env.local
 .vscode/
 .idea/

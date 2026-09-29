@@ -1,0 +1,5 @@
+ID,UserEmail,Platform,Status,CharCount,Limit,ScheduledAt,PublishedAt,Content
+post_1,"alex@example.com","Twitter","Published",126,280,"","2026-09-29 09:30:00","Excited to launch our new product today! Real-time platform character validation is finally here. 🚀 #Tech #Innovation"
+post_2,"alex@example.com","LinkedIn","Published",248,3000,"","2026-09-29 09:45:00","Clean architecture and controlled components in React make scaling modern frontend applications seamless. Continuous learning and strict validation rules are essential in modern software engineering."
+post_3,"alex@example.com","Twitter","Scheduled",114,280,"2026-10-01 10:00:00","","Upcoming Webinar: 'Mastering Database Relations and CSV Pipelines with React'. Reserve your free seat now! 🎙️"
+post_4,"sarah@tech.org","LinkedIn","Scheduled",182,3000,"2026-10-02 14:30:00","","We are looking for passionate frontend engineers who love building responsive UIs, controlled inputs, and real-time validation engines. DM me for career opportunities!"
