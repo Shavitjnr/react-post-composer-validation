@@ -1,13 +1,35 @@
-import React, { useState } from 'react';
-import { X, Lock, Mail, User, ShieldCheck, Database } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Lock, Mail, User, ShieldCheck, CheckCircle2, UserPlus, LogIn, ArrowRight } from 'lucide-react';
 import { csvStorage } from '../utils/csvStorage';
 
-export function AuthModal({ isOpen, onClose, onAuthSuccess, showToast }) {
-  const [isSignUp, setIsSignUp] = useState(false);
+export function AuthModal({
+  isOpen,
+  onClose,
+  onAuthSuccess,
+  showToast,
+  initialMode = 'login'
+}) {
+  const [isSignUp, setIsSignUp] = useState(initialMode === 'signup');
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('shavitdaloutra28@gmail.com');
+  const [email, setEmail] = useState('daloutrashavit@gmail.com');
   const [password, setPassword] = useState('shavitdaloutra');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (isOpen) {
+      const wantSignUp = initialMode === 'signup';
+      setIsSignUp(wantSignUp);
+      setError('');
+      if (wantSignUp) {
+        setName('');
+        setEmail('');
+        setPassword('');
+      } else {
+        setEmail('daloutrashavit@gmail.com');
+        setPassword('shavitdaloutra');
+      }
+    }
+  }, [isOpen, initialMode]);
 
   if (!isOpen) return null;
 
@@ -20,21 +42,30 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, showToast }) {
         setError('Please enter your full name.');
         return;
       }
+      if (!email.trim() || !email.includes('@')) {
+        setError('Please enter a valid email address.');
+        return;
+      }
       if (password.length < 6) {
         setError('Password must be at least 6 characters.');
         return;
       }
 
       // Registers directly into users.csv!
-      const res = csvStorage.registerUser(name.trim(), email.trim(), password);
+      const res = csvStorage.registerUser(name.trim(), email.trim(), password, 'Member');
       if (res.success) {
-        showToast(`User ${name} registered & saved to users.csv!`, 'success');
+        showToast(`Account created for ${name}! Redirecting to workspace...`, 'success');
         onAuthSuccess(res.user);
         onClose();
       } else {
-        setError(res.error);
+        setError(res.error || 'Failed to create account.');
       }
     } else {
+      if (!email.trim() || !password) {
+        setError('Please enter both email and password.');
+        return;
+      }
+
       // Authenticates by checking email and password in users.csv!
       const res = csvStorage.authenticateUser(email.trim(), password);
       if (res.success) {
@@ -42,7 +73,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, showToast }) {
         onAuthSuccess(res.user);
         onClose();
       } else {
-        setError(res.error);
+        setError(res.error || 'Invalid email or password.');
       }
     }
   };
@@ -55,43 +86,86 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, showToast }) {
   };
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-card auth-modal">
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-card auth-modal" onClick={(e) => e.stopPropagation()}>
+        {/* Modal Header */}
         <div className="modal-header">
           <div className="modal-title-row">
-            <Lock className="w-4 h-4 text-primary" />
+            {isSignUp ? (
+              <UserPlus className="w-5 h-5 text-primary" />
+            ) : (
+              <Lock className="w-5 h-5 text-primary" />
+            )}
             <span className="modal-title">
-              {isSignUp ? 'Get Started — Create Account' : 'Sign In to Post Composer Pro'}
+              {isSignUp ? 'Get Started Free — Create Your Account' : 'Log In to Personal Brand'}
             </span>
           </div>
-          <button type="button" onClick={onClose} className="modal-close-btn">
+          <button type="button" onClick={onClose} className="modal-close-btn" title="Close">
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* Quick Demo Credentials */}
-        <div className="demo-accounts-box">
-          <span className="demo-label">Quick Demo Access:</span>
-          <div className="demo-pills">
-            <button
-              type="button"
-              onClick={() => handleFillDemo('daloutrashavit@gmail.com', 'shavitdaloutra')}
-              className="demo-pill"
-            >
-              daloutrashavit@gmail.com
-            </button>
-            <button
-              type="button"
-              onClick={() => handleFillDemo('sarah@tech.org', 'sarahSecure#2026')}
-              className="demo-pill"
-            >
-              sarah@tech.org (Collaborator)
-            </button>
-          </div>
+        {/* Mode Segmented Switcher: Log In vs Sign Up */}
+        <div className="auth-mode-segmented-tabs">
+          <button
+            type="button"
+            onClick={() => {
+              setIsSignUp(false);
+              setError('');
+              if (!email) setEmail('daloutrashavit@gmail.com');
+              if (!password) setPassword('shavitdaloutra');
+            }}
+            className={`auth-segment-tab ${!isSignUp ? 'active' : ''}`}
+          >
+            <LogIn className="w-4 h-4" />
+            <span>Log In (Sign In)</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setIsSignUp(true);
+              setError('');
+            }}
+            className={`auth-segment-tab ${isSignUp ? 'active' : ''}`}
+          >
+            <UserPlus className="w-4 h-4" />
+            <span>Sign Up (Register)</span>
+          </button>
         </div>
+
+        {/* Demo Fast Log In Shortcuts (Only in Login Mode) */}
+        {!isSignUp && (
+          <div className="demo-accounts-box">
+            <span className="demo-label">Quick Demo 1-Click Access:</span>
+            <div className="demo-pills">
+              <button
+                type="button"
+                onClick={() => handleFillDemo('daloutrashavit@gmail.com', 'shavitdaloutra')}
+                className={`demo-pill ${email === 'daloutrashavit@gmail.com' ? 'active-pill' : ''}`}
+              >
+                👑 Super Admin (daloutrashavit@gmail.com)
+              </button>
+              <button
+                type="button"
+                onClick={() => handleFillDemo('sarah@tech.org', 'sarahSecure#2026')}
+                className={`demo-pill ${email === 'sarah@tech.org' ? 'active-pill' : ''}`}
+              >
+                👤 Normal User (sarah@tech.org)
+              </button>
+            </div>
+          </div>
+        )}
+
+        {isSignUp && (
+          <div className="signup-benefit-banner">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+            <span>Create a free account to unlock your personal workspace panel, multi-channel post composer, and calendar scheduling.</span>
+          </div>
+        )}
 
         {error && <div className="modal-error-banner">{error}</div>}
 
+        {/* Authentication Form */}
         <form onSubmit={handleSubmit} className="auth-form">
           {isSignUp && (
             <div className="form-field">
@@ -101,10 +175,11 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, showToast }) {
                 <input
                   type="text"
                   required
-                  placeholder="Your Name"
+                  placeholder="e.g. John Doe"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="modal-input"
+                  autoFocus
                 />
               </div>
             </div>
@@ -126,7 +201,9 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, showToast }) {
           </div>
 
           <div className="form-field">
-            <label className="field-label">Password (Stored in CSV)</label>
+            <label className="field-label">
+              Password {isSignUp ? '(Min 6 characters)' : ''}
+            </label>
             <div className="input-with-icon">
               <Lock className="input-icon" />
               <input
@@ -141,19 +218,23 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, showToast }) {
           </div>
 
           <p className="csv-storage-note">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Credentials & passwords are automatically synced to <code>data/users.csv</code></span>
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Safe offline storage synced with <code>data/users.csv</code></span>
           </p>
 
           <button type="submit" className="btn-modal-submit">
-            {isSignUp ? 'Save User to CSV & Login' : 'Authenticate & Sign In'}
+            <span>
+              {isSignUp ? 'Create Free Account & Go to Panel' : 'Log In & Open Panel'}
+            </span>
+            <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
+        {/* Bottom Switcher */}
         <div className="modal-toggle-row">
           {isSignUp ? (
             <span>
-              Already registered in CSV?{' '}
+              Already have an account?{' '}
               <button
                 type="button"
                 onClick={() => {
@@ -162,12 +243,12 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, showToast }) {
                 }}
                 className="link-toggle"
               >
-                Sign In
+                Log In here
               </button>
             </span>
           ) : (
             <span>
-              Need a new account?{' '}
+              Don't have an account yet?{' '}
               <button
                 type="button"
                 onClick={() => {
@@ -176,7 +257,7 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, showToast }) {
                 }}
                 className="link-toggle"
               >
-                Create Account in CSV
+                Sign Up for free
               </button>
             </span>
           )}

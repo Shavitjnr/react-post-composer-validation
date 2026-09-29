@@ -2020,6 +2020,65 @@ body {
   color: var(--primary);
 }
 
+.demo-pill.active-pill {
+  background-color: #2563eb;
+  color: #ffffff;
+  border-color: #1d4ed8;
+  font-weight: 700;
+}
+
+.auth-mode-segmented-tabs {
+  display: flex;
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.auth-segment-tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.auth-segment-tab:hover {
+  color: #0f172a;
+}
+
+.auth-segment-tab.active {
+  background-color: #ffffff;
+  color: #2563eb;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.signup-benefit-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  background-color: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.45;
+  margin-bottom: 14px;
+}
+
 .auth-form,
 .schedule-form {
   display: flex;
@@ -4571,6 +4630,23 @@ body {
 
 .btn-landing-login:hover {
   background-color: #f1f5f9;
+}
+
+.btn-landing-signup {
+  background-color: #f8fafc;
+  border: 1px solid #94a3b8;
+  color: #0f172a;
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-landing-signup:hover {
+  background-color: #e2e8f0;
+  border-color: #64748b;
 }
 
 .btn-landing-primary {

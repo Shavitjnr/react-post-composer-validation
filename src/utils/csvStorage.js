@@ -206,15 +206,13 @@ export const csvStorage = {
     const raw = localStorage.getItem(ACTIVE_USER_KEY);
     if (raw) {
       try {
-        return JSON.parse(raw);
+        const parsed = JSON.parse(raw);
+        if (parsed && (parsed.email || parsed.id)) {
+          return parsed;
+        }
       } catch (e) {}
     }
-    return {
-      id: 'usr_1',
-      name: 'Shavit Daloutra',
-      email: 'shavitdaloutra28@gmail.com',
-      role: 'Super Admin',
-    };
+    return null;
   },
 
   logoutUser: () => {

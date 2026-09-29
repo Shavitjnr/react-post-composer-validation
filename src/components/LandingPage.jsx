@@ -20,7 +20,13 @@ import {
 } from 'lucide-react';
 import { PLATFORM_RULES } from '../constants/platformRules';
 
-export function LandingPage({ onGetStartedFree, onOpenAuth, onSelectPaidPlan }) {
+export function LandingPage({
+  onGetStartedFree,
+  onOpenAuth,
+  onOpenLogin,
+  onOpenSignUp,
+  onSelectPaidPlan
+}) {
   const [demoPlatform, setDemoPlatform] = useState('twitter');
   const [demoText, setDemoText] = useState('Crafting our enterprise multi-channel campaign with Post Composer Pro! Character limits are strictly verified in real-time across all 5 channels.');
 
@@ -54,16 +60,27 @@ export function LandingPage({ onGetStartedFree, onOpenAuth, onSelectPaidPlan }) 
           <div className="landing-nav-actions">
             <button
               type="button"
-              onClick={onOpenAuth}
+              onClick={onOpenLogin || onOpenAuth}
               className="btn-landing-login"
+              title="Log in to existing account"
             >
-              <span>Sign In</span>
+              <span>Log In</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={onOpenSignUp || onGetStartedFree}
+              className="btn-landing-signup"
+              title="Register a new account"
+            >
+              <span>Sign Up</span>
             </button>
 
             <button
               type="button"
               onClick={onGetStartedFree}
               className="btn-landing-primary"
+              title="Create account and launch workspace"
             >
               <span>Get Started Free</span>
               <ArrowRight className="w-4 h-4" />
@@ -456,8 +473,11 @@ export function LandingPage({ onGetStartedFree, onOpenAuth, onSelectPaidPlan }) 
             <button type="button" onClick={onGetStartedFree} className="footer-link-btn">
               Get Started Free
             </button>
-            <button type="button" onClick={onOpenAuth} className="footer-link-btn">
-              Account Login / Register
+            <button type="button" onClick={onOpenLogin || onOpenAuth} className="footer-link-btn">
+              Sign In to Account
+            </button>
+            <button type="button" onClick={onOpenSignUp || onGetStartedFree} className="footer-link-btn">
+              Sign Up (Register)
             </button>
           </div>
 

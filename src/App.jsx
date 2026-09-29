@@ -48,6 +48,7 @@ function App({ hasClerkConfigured = false }) {
   const [isWorkspaceModalOpen, setIsWorkspaceModalOpen] = useState(false);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [authInitialMode, setAuthInitialMode] = useState('login'); // 'login' | 'signup'
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [selectedCheckoutPlan, setSelectedCheckoutPlan] = useState(null);
   const [toast, setToast] = useState(null);
@@ -100,8 +101,9 @@ function App({ hasClerkConfigured = false }) {
   useEffect(() => {
     if (currentRoute === 'panel' && !effectiveUser) {
       navigate('home');
+      setAuthInitialMode('signup');
       setIsAuthOpen(true);
-      showToast('Authentication required: Please sign in or click "Get Started Free" to access your workspace panel.', 'info');
+      showToast('Authentication required: Please sign up or log in to access your workspace panel.', 'info');
     }
   }, [currentRoute, effectiveUser]);
 
@@ -142,13 +144,24 @@ function App({ hasClerkConfigured = false }) {
     }
   };
 
-  // Only Get Started Free prompts login and moves to /Pannel
+  // Get Started Free prompts Sign Up if not logged in, or goes to /Pannel if logged in
   const handleGetStartedFree = () => {
     if (effectiveUser) {
       navigate('panel');
     } else {
+      setAuthInitialMode('signup');
       setIsAuthOpen(true);
     }
+  };
+
+  const handleOpenLogin = () => {
+    setAuthInitialMode('login');
+    setIsAuthOpen(true);
+  };
+
+  const handleOpenSignUp = () => {
+    setAuthInitialMode('signup');
+    setIsAuthOpen(true);
   };
 
   // Transparent pricing plans trigger verified checkout flow (NEVER directly to panel)
@@ -177,7 +190,9 @@ function App({ hasClerkConfigured = false }) {
       {currentRoute === 'home' && (
         <LandingPage
           onGetStartedFree={handleGetStartedFree}
-          onOpenAuth={() => setIsAuthOpen(true)}
+          onOpenLogin={handleOpenLogin}
+          onOpenSignUp={handleOpenSignUp}
+          onOpenAuth={handleOpenLogin}
           onSelectPaidPlan={handleSelectPaidPlan}
         />
       )}
@@ -363,6 +378,7 @@ function App({ hasClerkConfigured = false }) {
         onClose={() => setIsAuthOpen(false)}
         onAuthSuccess={handleAuthSuccess}
         showToast={showToast}
+        initialMode={authInitialMode}
       />
 
       <PaymentCheckoutModal
