@@ -23,7 +23,7 @@ import { subscriptionService } from './services/subscriptionService';
 import { csvStorage } from './utils/csvStorage';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
-function App() {
+function App({ hasClerkConfigured = false }) {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [currentUser, setCurrentUser] = useState(() => csvStorage.getActiveUser());
   const [workspaces, setWorkspaces] = useState(() => workspaceService.getAllWorkspaces());
@@ -86,6 +86,7 @@ function App() {
           onNavigate={(tab) => setActiveTab(tab)}
           onOpenMediaUpload={() => setActiveTab('media')}
           showToast={showToast}
+          hasClerkConfigured={hasClerkConfigured}
         />
 
         {/* Dynamic Main Workspace Content */}

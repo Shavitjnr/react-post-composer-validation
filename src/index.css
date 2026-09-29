@@ -4261,3 +4261,76 @@ body {
   gap: 12px;
 }
 
+/* ==========================================================================
+   Clerk Authentication Controls (Header & Sidebar)
+   ========================================================================== */
+.clerk-pill-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  padding: 5px 10px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.clerk-pill-status .clerk-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #2563eb;
+}
+
+.clerk-auth-cluster {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-clerk-signin {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-clerk-signin:hover {
+  background-color: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.btn-clerk-signup {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #2563eb;
+  border: 1px solid #2563eb;
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-clerk-signup:hover {
+  background-color: #1d4ed8;
+}
+
+.clerk-user-button-wrap {
+  display: flex;
+  align-items: center;
+}
+

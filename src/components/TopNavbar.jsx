@@ -14,13 +14,15 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { notificationService } from '../services/notificationService';
+import { ClerkNavControls } from './ClerkAuthControls';
 
 export function TopNavbar({
   activeWorkspace,
   onOpenWorkspaceModal,
   onNavigate,
   onOpenMediaUpload,
-  showToast
+  showToast,
+  hasClerkConfigured
 }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showCreateMenu, setShowCreateMenu] = useState(false);
@@ -171,6 +173,9 @@ export function TopNavbar({
             </div>
           )}
         </div>
+
+        {/* Clerk Authentication Controls */}
+        <ClerkNavControls hasClerkConfigured={hasClerkConfigured} />
 
         {/* Workspace Switcher Pill */}
         <button
