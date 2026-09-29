@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # Production Service: Production-ready Nginx serving optimized bundle
+  # Run: docker compose up --build
+  # Access: http://localhost:3000
+  # ----------------------------------------------------------------------------
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: personal_brand_prod
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # ----------------------------------------------------------------------------
+  # Development Service: Hot-reloading Vite dev server inside container
+  # Run: docker compose --profile dev up --build dev
+  # Access: http://localhost:5173
+  # ----------------------------------------------------------------------------
+  dev:
+    profiles: ["dev"]
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: personal_brand_dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_PORT=5173
