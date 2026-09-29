@@ -6,25 +6,31 @@ import { ScheduleModal } from './ScheduleModal';
 import { validatePost, getPlatformLimit } from '../utils/validation';
 import { csvStorage } from '../utils/csvStorage';
 import {
+  Smile,
   Hash,
   AtSign,
   Trash2,
   Bookmark,
   Calendar,
   Send,
-  Quote,
   List
 } from 'lucide-react';
 
 const COMMON_HASHTAGS = ['#Engineering', '#Architecture', '#Tech', '#Software', '#React', '#NextJS'];
+const CURATED_EMOJIS = ['🚀', '💡', '🔥', '✨', '🎙️', '👍', '📈', '👏', '🎯', '🧵', '😊', '🙌', '💼', '📊', '⚡'];
 
 export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSaved }) {
   const [platform, setPlatform] = useState('Twitter');
   const [content, setContent] = useState('');
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
 
   // Dynamic Validation Engine
   const validation = validatePost(content, platform);
+
+  const insertEmoji = (emoji) => {
+    setContent((prev) => (prev.endsWith(' ') || prev.length === 0 ? prev : prev + ' ') + emoji + ' ');
+  };
 
   const insertHashtag = (tag) => {
     setContent((prev) => (prev.endsWith(' ') || prev.length === 0 ? prev : prev + ' ') + tag + ' ');
@@ -34,13 +40,6 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
     const handle = prompt('Enter handle or username without @:');
     if (handle && handle.trim()) {
       setContent((prev) => (prev.endsWith(' ') || prev.length === 0 ? prev : prev + ' ') + `@${handle.trim()} `);
-    }
-  };
-
-  const insertQuote = () => {
-    const quoteText = prompt('Enter quote text:');
-    if (quoteText && quoteText.trim()) {
-      setContent((prev) => (prev.length === 0 ? '' : prev + '\n') + `"${quoteText.trim()}"\n`);
     }
   };
 
@@ -149,36 +148,40 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
               className="composer-textarea"
             />
 
-            {/* Professional Text Utility Toolbar (No emojis) */}
+            {/* Professional Text Utility Toolbar with Emoji Button */}
             <div className="editor-toolbar">
               <div className="toolbar-left">
+                {/* Emoji button replacing Quote button */}
                 <button
                   type="button"
-                  onClick={insertQuote}
-                  className="toolbar-btn"
-                  title="Insert Quote block"
+                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  className={`toolbar-btn ${showEmojiPicker ? 'active-tool' : ''}`}
+                  title="Insert Emoji"
                 >
-                  <Quote className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Quote</span>
+                  <Smile className="w-3.5 h-3.5 text-amber-500" />
+                  <span>Emoji</span>
                 </button>
+
                 <button
                   type="button"
                   onClick={insertBullet}
                   className="toolbar-btn"
                   title="Insert Bullet Point"
                 >
-                  <List className="w-3.5 h-3.5 text-slate-400" />
+                  <List className="w-3.5 h-3.5" />
                   <span>Bullet</span>
                 </button>
+
                 <button
                   type="button"
                   onClick={insertMention}
                   className="toolbar-btn"
                   title="Insert Mention"
                 >
-                  <AtSign className="w-3.5 h-3.5 text-slate-400" />
+                  <AtSign className="w-3.5 h-3.5" />
                   <span>Mention</span>
                 </button>
+
                 <button
                   type="button"
                   onClick={handleClear}
@@ -193,7 +196,7 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
 
               {/* Hashtag Quick Chips */}
               <div className="toolbar-right">
-                <Hash className="w-3 h-3 text-slate-500" />
+                <Hash className="w-3 h-3 text-slate-400" />
                 {COMMON_HASHTAGS.slice(0, 4).map((tag) => (
                   <button
                     key={tag}
@@ -206,6 +209,25 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
                 ))}
               </div>
             </div>
+
+            {/* Emoji Quick Picker Bar */}
+            {showEmojiPicker && (
+              <div className="emoji-picker-tray">
+                <span className="tray-label">Emojis:</span>
+                <div className="emoji-list">
+                  {CURATED_EMOJIS.map((emoji) => (
+                    <button
+                      key={emoji}
+                      type="button"
+                      onClick={() => insertEmoji(emoji)}
+                      className="emoji-btn"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
