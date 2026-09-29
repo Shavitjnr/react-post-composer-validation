@@ -6,8 +6,7 @@ import {
   Star,
   Copy,
   Trash2,
-  Search,
-  Plus
+  Search
 } from 'lucide-react';
 
 export function DraftsManager({ onOpenComposerWithContent, showToast }) {
@@ -57,7 +56,7 @@ export function DraftsManager({ onOpenComposerWithContent, showToast }) {
         <div>
           <h2 className="section-title">Drafts Repository (drafts.csv)</h2>
           <p className="section-subtitle">
-            Saved drafts are stored in <code>data/drafts.csv</code> and can be edited or duplicated.
+            Saved drafts are stored in <code>data/drafts.csv</code> and can be reviewed, edited, or duplicated.
           </p>
         </div>
       </div>
@@ -93,7 +92,7 @@ export function DraftsManager({ onOpenComposerWithContent, showToast }) {
             className={`filter-pill-btn fav-btn ${onlyFavorites ? 'active' : ''}`}
           >
             <Star className={`w-3.5 h-3.5 ${onlyFavorites ? 'fill-amber text-amber' : ''}`} />
-            <span>Favorites</span>
+            <span>Starred</span>
           </button>
         </div>
       </div>
@@ -102,7 +101,7 @@ export function DraftsManager({ onOpenComposerWithContent, showToast }) {
       {filteredDrafts.length === 0 ? (
         <div className="empty-state-box">
           <FileText className="w-8 h-8 text-slate-500 mb-2" />
-          <p>No drafts match your filters.</p>
+          <p>No drafts match your selected criteria.</p>
         </div>
       ) : (
         <div className="cards-grid-3">
@@ -121,7 +120,7 @@ export function DraftsManager({ onOpenComposerWithContent, showToast }) {
                       type="button"
                       onClick={() => handleToggleFavorite(d.ID)}
                       className="star-fav-btn"
-                      title={isFav ? 'Remove favorite' : 'Mark favorite'}
+                      title={isFav ? 'Remove Star' : 'Mark as Starred'}
                     >
                       <Star className={`w-4 h-4 ${isFav ? 'fill-amber text-amber' : 'text-slate-500'}`} />
                     </button>

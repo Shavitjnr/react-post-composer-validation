@@ -6,31 +6,25 @@ import { ScheduleModal } from './ScheduleModal';
 import { validatePost, getPlatformLimit } from '../utils/validation';
 import { csvStorage } from '../utils/csvStorage';
 import {
-  Smile,
   Hash,
   AtSign,
   Trash2,
   Bookmark,
   Calendar,
   Send,
-  Sparkles
+  Quote,
+  List
 } from 'lucide-react';
 
-const COMMON_EMOJIS = ['🚀', '💡', '🔥', '✨', '🎙️', '👍', '📈', '👏', '🎯', '🧵'];
-const COMMON_HASHTAGS = ['#React', '#WebDev', '#Tech', '#AI', '#Coding', '#NextJS', '#Productivity'];
+const COMMON_HASHTAGS = ['#Engineering', '#Architecture', '#Tech', '#Software', '#React', '#NextJS'];
 
 export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSaved }) {
   const [platform, setPlatform] = useState('Twitter');
   const [content, setContent] = useState('');
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
 
   // Dynamic Validation Engine
   const validation = validatePost(content, platform);
-
-  const insertEmoji = (emoji) => {
-    setContent((prev) => (prev.endsWith(' ') || prev.length === 0 ? prev : prev + ' ') + emoji + ' ');
-  };
 
   const insertHashtag = (tag) => {
     setContent((prev) => (prev.endsWith(' ') || prev.length === 0 ? prev : prev + ' ') + tag + ' ');
@@ -43,13 +37,24 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
     }
   };
 
+  const insertQuote = () => {
+    const quoteText = prompt('Enter quote text:');
+    if (quoteText && quoteText.trim()) {
+      setContent((prev) => (prev.length === 0 ? '' : prev + '\n') + `"${quoteText.trim()}"\n`);
+    }
+  };
+
+  const insertBullet = () => {
+    setContent((prev) => (prev.length === 0 ? '' : prev + '\n') + '• ');
+  };
+
   const handleClear = () => {
-    if (content.length > 0 && confirm('Clear the post composer?')) {
+    if (content.length > 0 && confirm('Clear the current text in the post editor?')) {
       setContent('');
     }
   };
 
-  // Publish immediate post -> saves to posts.csv!
+  // Publish immediate post -> saves to posts.csv
   const handlePublish = () => {
     if (!validation.isValid) return;
 
@@ -62,12 +67,12 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
       limit: validation.limit,
     });
 
-    showToast(`Post published & saved to posts.csv for ${platform}!`, 'success');
+    showToast(`Post published and recorded to posts.csv for ${platform}.`, 'success');
     setContent('');
     if (onPostCreated) onPostCreated();
   };
 
-  // Save to drafts.csv!
+  // Save to drafts.csv
   const handleSaveDraft = () => {
     if (!content.trim()) return;
 
@@ -78,12 +83,12 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
       isFavorite: false,
     });
 
-    showToast(`Draft saved to drafts.csv for ${platform}!`, 'success');
+    showToast(`Draft saved to drafts.csv for ${platform}.`, 'success');
     setContent('');
     if (onDraftSaved) onDraftSaved();
   };
 
-  // Schedule future release -> saves to posts.csv with Scheduled status!
+  // Schedule future release -> saves to posts.csv with Scheduled status
   const handleConfirmSchedule = (scheduledAt) => {
     setShowScheduleModal(false);
 
@@ -97,23 +102,23 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
       scheduledAt,
     });
 
-    showToast(`Post scheduled for ${scheduledAt} & saved to posts.csv!`, 'success');
+    showToast(`Post scheduled for ${scheduledAt} and recorded to posts.csv.`, 'success');
     setContent('');
     if (onPostCreated) onPostCreated();
   };
 
   return (
     <div className="composer-layout-grid">
-      {/* Left: Interactive Composer Card */}
+      {/* Left: Classic Editorial Composer Card */}
       <div className="composer-card-main">
         {/* Header */}
         <div className="composer-card-header">
-          <div className="header-pill">Controlled React Component</div>
+          <div className="header-pill">Controlled Component Engine</div>
           <h2 className="composer-heading">
-            Post Composer Pro
+            Post Composer
           </h2>
           <p className="composer-subheading">
-            Write your message, validate platform limits in real-time, and store data in CSV.
+            Validate platform character limits in real-time and store records into structured CSV files.
           </p>
         </div>
 
@@ -124,15 +129,13 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
         />
 
         {/* 2. Controlled Textarea Component */}
-        {/* EXPLANATION: The textarea is a controlled component whose value is bound to */}
-        {/* state 'content' and updated in real-time on every keystroke via setContent. */}
         <div className="composer-editor-wrapper">
           <div className="editor-label-bar">
             <label htmlFor="composer-textarea" className="editor-label">
-              Message Content
+              Composition Text
             </label>
             <span className="editor-hint">
-              Auto-syncs with Live Mockup & CSV Store
+              Synchronized with preview and CSV storage
             </span>
           </div>
 
@@ -142,27 +145,38 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
               rows={6}
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder={`Write your ${platform} post here... (Validation rules: max ${validation.limit} characters)`}
+              placeholder={`Enter your ${platform} publication content here... (Maximum limit: ${validation.limit} characters)`}
               className="composer-textarea"
             />
 
-            {/* Quick Assistant Toolbar */}
+            {/* Professional Text Utility Toolbar (No emojis) */}
             <div className="editor-toolbar">
               <div className="toolbar-left">
                 <button
                   type="button"
-                  onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                  onClick={insertQuote}
                   className="toolbar-btn"
+                  title="Insert Quote block"
                 >
-                  <Smile className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Emoji</span>
+                  <Quote className="w-3.5 h-3.5 text-slate-400" />
+                  <span>Quote</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={insertBullet}
+                  className="toolbar-btn"
+                  title="Insert Bullet Point"
+                >
+                  <List className="w-3.5 h-3.5 text-slate-400" />
+                  <span>Bullet</span>
                 </button>
                 <button
                   type="button"
                   onClick={insertMention}
                   className="toolbar-btn"
+                  title="Insert Mention"
                 >
-                  <AtSign className="w-3.5 h-3.5 text-sky-400" />
+                  <AtSign className="w-3.5 h-3.5 text-slate-400" />
                   <span>Mention</span>
                 </button>
                 <button
@@ -170,6 +184,7 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
                   onClick={handleClear}
                   disabled={content.length === 0}
                   className="toolbar-btn text-danger disabled-btn"
+                  title="Clear editor"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>Clear</span>
@@ -191,23 +206,6 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
                 ))}
               </div>
             </div>
-
-            {/* Emoji Quick Picker Dropdown */}
-            {showEmojiPicker && (
-              <div className="emoji-picker-tray">
-                <span className="tray-label">Quick Emojis:</span>
-                {COMMON_EMOJIS.map((emoji) => (
-                  <button
-                    key={emoji}
-                    type="button"
-                    onClick={() => insertEmoji(emoji)}
-                    className="emoji-btn"
-                  >
-                    {emoji}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 
@@ -222,7 +220,7 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
             disabled={!content.trim()}
             className="btn-draft"
           >
-            <Bookmark className="w-4 h-4 text-sky-400" />
+            <Bookmark className="w-4 h-4" />
             <span>Save to drafts.csv</span>
           </button>
 
@@ -233,7 +231,7 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
               disabled={!validation.isValid}
               className="btn-schedule"
             >
-              <Calendar className="w-4 h-4 text-indigo-400" />
+              <Calendar className="w-4 h-4" />
               <span>Schedule</span>
             </button>
 
@@ -244,13 +242,13 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
               className="btn-publish"
             >
               <Send className="w-4 h-4" />
-              <span>Publish & Save to posts.csv</span>
+              <span>Publish to {platform}</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Right: Live Platform Mockup Panel */}
+      {/* Right: Platform Mockup Panel */}
       <div className="preview-panel-sticky">
         <PostPreview
           platform={platform}

@@ -1,28 +1,28 @@
 /**
  * CSV Storage & Engine
  * Manages full CRUD operations for Users (with passwords), Posts, and Drafts stored in CSV format.
+ * Professional, classic format without emojis or informal markers.
  */
 
-// Initial default CSV datasets
+// Initial default CSV datasets (Clean, professional, without emojis)
 export const DEFAULT_USERS_CSV = `ID,Name,Email,Password,Role,CreatedAt
-usr_1,"Alex Morgan","alex@example.com","password123","Admin","2026-09-29 09:00:00"
-usr_2,"Sarah Connor","sarah@tech.org","sarahSecure#2026","Creator","2026-09-29 09:15:00"
-usr_3,"David Chen","david@startup.io","davidPass!789","Editor","2026-09-29 09:30:00"`;
+usr_1,"Alex Morgan","alex@example.com","password123","Administrator","2026-09-29 09:00:00"
+usr_2,"Sarah Connor","sarah@tech.org","sarahSecure#2026","Editor","2026-09-29 09:15:00"
+usr_3,"David Chen","david@startup.io","davidPass!789","Contributor","2026-09-29 09:30:00"`;
 
 export const DEFAULT_POSTS_CSV = `ID,UserEmail,Platform,Status,CharCount,Limit,ScheduledAt,PublishedAt,Content
-post_1,"alex@example.com","Twitter","Published",126,280,"","2026-09-29 09:30:00","Excited to launch our new product today! Real-time platform character validation is finally here. 🚀 #Tech #Innovation"
-post_2,"alex@example.com","LinkedIn","Published",248,3000,"","2026-09-29 09:45:00","Clean architecture and controlled components in React make scaling modern frontend applications seamless. Continuous learning and strict validation rules are essential in modern software engineering."
-post_3,"alex@example.com","Twitter","Scheduled",114,280,"2026-10-01 10:00:00","","Upcoming Webinar: 'Mastering Database Relations and CSV Pipelines with React'. Reserve your free seat now! 🎙️"
-post_4,"sarah@tech.org","LinkedIn","Scheduled",182,3000,"2026-10-02 14:30:00","","We are looking for passionate frontend engineers who love building responsive UIs, controlled inputs, and real-time validation engines. DM me for career opportunities!"`;
+post_1,"alex@example.com","Twitter","Published",118,280,"","2026-09-29 09:30:00","Announcing our corporate platform release today. Enterprise-grade character validation is now live across all channels."
+post_2,"alex@example.com","LinkedIn","Published",254,3000,"","2026-09-29 09:45:00","Clean architectural discipline and controlled state management in React provide stability for mission-critical software systems. Centralized validation rules remain essential for institutional web engineering."
+post_3,"alex@example.com","Twitter","Scheduled",108,280,"2026-10-01 10:00:00","","Upcoming Technical Seminar: Database Normalization and CSV Pipeline Design with React. Registration is open."
+post_4,"sarah@tech.org","LinkedIn","Scheduled",178,3000,"2026-10-02 14:30:00","","Our engineering organization is currently hiring Senior Frontend Architects experienced in controlled components and state governance. Please review our open listings."`;
 
 export const DEFAULT_DRAFTS_CSV = `ID,UserEmail,Platform,IsFavorite,CreatedAt,Content
-draft_1,"alex@example.com","Twitter","true","2026-09-29 08:30:00","Draft thoughts on custom React hooks and memoization strategies for heavy UI rerenders..."
-draft_2,"alex@example.com","LinkedIn","false","2026-09-29 08:45:00","Reflecting on 5 lessons learned while building high-traffic SaaS applications. Stay tuned for the complete breakdown next Tuesday!"
-draft_3,"sarah@tech.org","Twitter","true","2026-09-29 09:10:00","Top 5 productivity tools every software developer should try in 2026 🧵👇"`;
+draft_1,"alex@example.com","Twitter","true","2026-09-29 08:30:00","Preliminary review notes regarding custom hooks and state encapsulation across enterprise React applications."
+draft_2,"alex@example.com","LinkedIn","false","2026-09-29 08:45:00","Five key principles observed during high-reliability software deployments. Full technical analysis will follow next Tuesday."
+draft_3,"sarah@tech.org","Twitter","true","2026-09-29 09:10:00","Summary of performance profiling benchmarks for production web services in 2026."`;
 
 /**
- * Robust RFC-4180 compliant CSV parser
- * Correctly parses cells containing escaped quotes, commas, and line breaks
+ * RFC-4180 compliant CSV parser
  */
 export function parseCSV(csvText) {
   if (!csvText || !csvText.trim()) return [];
@@ -38,7 +38,7 @@ export function parseCSV(csvText) {
     if (char === '"') {
       if (inQuotes && nextChar === '"') {
         currentCell += '"';
-        i++; // skip escaped quote
+        i++;
       } else {
         inQuotes = !inQuotes;
       }
@@ -46,7 +46,7 @@ export function parseCSV(csvText) {
       currentRow.push(currentCell.trim());
       currentCell = '';
     } else if ((char === '\r' || char === '\n') && !inQuotes) {
-      if (char === '\r' && nextChar === '\n') i++; // Handle CRLF
+      if (char === '\r' && nextChar === '\n') i++;
       currentRow.push(currentCell.trim());
       if (currentRow.some((c) => c !== '')) rows.push(currentRow);
       currentRow = [];
@@ -118,7 +118,7 @@ const DRAFTS_KEY = 'csv_drafts_database';
 const ACTIVE_USER_KEY = 'csv_active_user_session';
 
 export const csvStorage = {
-  // ================= USERS & PASSWORDS =================
+  // USERS & PASSWORDS
   getUsersCSV: () => {
     let raw = localStorage.getItem(USERS_KEY);
     if (!raw) {
@@ -149,15 +149,15 @@ export const csvStorage = {
   registerUser: (name, email, password) => {
     const users = csvStorage.getUsers();
     if (users.some((u) => u.Email.toLowerCase() === email.toLowerCase())) {
-      return { success: false, error: 'User with this email already exists in CSV database' };
+      return { success: false, error: 'User with this email already exists in the CSV database' };
     }
 
     const newUser = {
       ID: `usr_${Date.now()}`,
       Name: name,
       Email: email,
-      Password: password, // Stored directly in CSV database
-      Role: 'Creator',
+      Password: password,
+      Role: 'Author',
       CreatedAt: new Date().toISOString().replace('T', ' ').slice(0, 19),
     };
 
@@ -177,12 +177,11 @@ export const csvStorage = {
         return JSON.parse(raw);
       } catch (e) {}
     }
-    // Default demo user Alex Morgan
     return {
       id: 'usr_1',
       name: 'Alex Morgan',
       email: 'alex@example.com',
-      role: 'Admin',
+      role: 'Administrator',
     };
   },
 
@@ -190,7 +189,7 @@ export const csvStorage = {
     localStorage.removeItem(ACTIVE_USER_KEY);
   },
 
-  // ================= POSTS =================
+  // POSTS
   getPostsCSV: () => {
     let raw = localStorage.getItem(POSTS_KEY);
     if (!raw) {
@@ -267,7 +266,7 @@ export const csvStorage = {
     localStorage.setItem(POSTS_KEY, updatedCSV);
   },
 
-  // ================= DRAFTS =================
+  // DRAFTS
   getDraftsCSV: () => {
     let raw = localStorage.getItem(DRAFTS_KEY);
     if (!raw) {
@@ -313,7 +312,6 @@ export const csvStorage = {
     localStorage.setItem(DRAFTS_KEY, updatedCSV);
   },
 
-  // Reset to initial demo CSV files
   resetAllToDefault: () => {
     localStorage.setItem(USERS_KEY, DEFAULT_USERS_CSV);
     localStorage.setItem(POSTS_KEY, DEFAULT_POSTS_CSV);

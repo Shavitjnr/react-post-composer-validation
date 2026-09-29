@@ -1,4 +1,4 @@
 ID,Name,Email,Password,Role,CreatedAt
-usr_1,"Alex Morgan","alex@example.com","password123","Admin","2026-09-29 09:00:00"
-usr_2,"Sarah Connor","sarah@tech.org","sarahSecure#2026","Creator","2026-09-29 09:15:00"
-usr_3,"David Chen","david@startup.io","davidPass!789","Editor","2026-09-29 09:30:00"
+usr_1,"Alex Morgan","alex@example.com","password123","Administrator","2026-09-29 09:00:00"
+usr_2,"Sarah Connor","sarah@tech.org","sarahSecure#2026","Editor","2026-09-29 09:15:00"
+usr_3,"David Chen","david@startup.io","davidPass!789","Contributor","2026-09-29 09:30:00"

@@ -1,4 +1,4 @@
 ID,UserEmail,Platform,IsFavorite,CreatedAt,Content
-draft_1,"alex@example.com","Twitter","true","2026-09-29 08:30:00","Draft thoughts on custom React hooks and memoization strategies for heavy UI rerenders..."
-draft_2,"alex@example.com","LinkedIn","false","2026-09-29 08:45:00","Reflecting on 5 lessons learned while building high-traffic SaaS applications. Stay tuned for the complete breakdown next Tuesday!"
-draft_3,"sarah@tech.org","Twitter","true","2026-09-29 09:10:00","Top 5 productivity tools every software developer should try in 2026 🧵👇"
+draft_1,"alex@example.com","Twitter","true","2026-09-29 08:30:00","Preliminary review notes regarding custom hooks and state encapsulation across enterprise React applications."
+draft_2,"alex@example.com","LinkedIn","false","2026-09-29 08:45:00","Five key principles observed during high-reliability software deployments. Full technical analysis will follow next Tuesday."
+draft_3,"sarah@tech.org","Twitter","true","2026-09-29 09:10:00","Summary of performance profiling benchmarks for production web services in 2026."

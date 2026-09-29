@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 
 export function PostPreview({ platform, content, authorName = 'Alex Morgan' }) {
-  const displayContent = content.trim() || 'Your live post preview will render here in real-time as you type in the editor...';
+  const displayContent = content.trim() || 'Your live post preview will render here in real-time as you type in the editor.';
 
   const renderFormattedText = (text) => {
     const parts = text.split(/(\s+)/);
@@ -71,10 +71,10 @@ export function PostPreview({ platform, content, authorName = 'Alex Morgan' }) {
             <button type="button" className="twitter-action-btn">
               <MessageCircle className="w-4 h-4" /> <span>28</span>
             </button>
-            <button type="button" className="twitter-action-btn hover-green">
+            <button type="button" className="twitter-action-btn">
               <Repeat2 className="w-4 h-4" /> <span>14</span>
             </button>
-            <button type="button" className="twitter-action-btn hover-red">
+            <button type="button" className="twitter-action-btn">
               <Heart className="w-4 h-4" /> <span>245</span>
             </button>
             <button type="button" className="twitter-action-btn">
@@ -97,7 +97,7 @@ export function PostPreview({ platform, content, authorName = 'Alex Morgan' }) {
                 <span className="mockup-name">{authorName}</span>
                 <span className="linkedin-degree">• 1st</span>
               </div>
-              <p className="mockup-headline">Full-Stack Architect & Tech Lead</p>
+              <p className="mockup-headline">Software Architect & Engineering Lead</p>
               <div className="mockup-time-globe">
                 <span>Just now</span>
                 <span>•</span>
@@ -113,8 +113,9 @@ export function PostPreview({ platform, content, authorName = 'Alex Morgan' }) {
 
           <div className="mockup-linkedin-stats">
             <div className="linkedin-reactions">
-              <span className="reaction-bubble blue">👍</span>
-              <span className="reaction-bubble red">❤️</span>
+              <span className="reaction-icon-box">
+                <ThumbsUp className="w-3 h-3 text-blue-400" />
+              </span>
               <span className="reaction-count">112 reactions</span>
             </div>
             <span className="linkedin-counts">24 comments • 8 reposts</span>
