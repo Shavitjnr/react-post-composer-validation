@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { PLATFORM_RULES } from '../constants/platformRules';
 
-export function LandingPage({ onNavigateToPanel, onNavigateToAdmin, onOpenAuth }) {
+export function LandingPage({ onGetStartedFree, onOpenAuth, onSelectPaidPlan }) {
   const [demoPlatform, setDemoPlatform] = useState('twitter');
   const [demoText, setDemoText] = useState('Crafting our enterprise multi-channel campaign with Post Composer Pro! Character limits are strictly verified in real-time across all 5 channels.');
 
@@ -62,10 +62,10 @@ export function LandingPage({ onNavigateToPanel, onNavigateToAdmin, onOpenAuth }
 
             <button
               type="button"
-              onClick={onNavigateToPanel}
+              onClick={onGetStartedFree}
               className="btn-landing-primary"
             >
-              <span>Open Panel</span>
+              <span>Get Started Free</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -93,11 +93,11 @@ export function LandingPage({ onNavigateToPanel, onNavigateToAdmin, onOpenAuth }
           <div className="hero-cta-group">
             <button
               type="button"
-              onClick={onNavigateToPanel}
+              onClick={onGetStartedFree}
               className="btn-hero-launch"
             >
               <Zap className="w-5 h-5" />
-              <span>Launch App Panel (/Pannel)</span>
+              <span>Get Started Free</span>
               <ArrowRight className="w-4 h-4" />
             </button>
 
@@ -223,10 +223,10 @@ export function LandingPage({ onNavigateToPanel, onNavigateToAdmin, onOpenAuth }
 
                 <button
                   type="button"
-                  onClick={onNavigateToPanel}
+                  onClick={onGetStartedFree}
                   className="btn-interactive-open"
                 >
-                  <span>Open Full Composer</span>
+                  <span>Get Started Free to Post</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -352,7 +352,7 @@ export function LandingPage({ onNavigateToPanel, onNavigateToAdmin, onOpenAuth }
             </ul>
             <button
               type="button"
-              onClick={onNavigateToPanel}
+              onClick={onGetStartedFree}
               className="btn-plan-select"
             >
               Get Started Free
@@ -375,10 +375,10 @@ export function LandingPage({ onNavigateToPanel, onNavigateToAdmin, onOpenAuth }
             </ul>
             <button
               type="button"
-              onClick={onNavigateToPanel}
+              onClick={() => onSelectPaidPlan({ id: 'starter', name: 'Starter', price: 29 })}
               className="btn-plan-select"
             >
-              Start Starter
+              Verify & Subscribe Starter ($29/mo)
             </button>
           </div>
 
@@ -400,10 +400,10 @@ export function LandingPage({ onNavigateToPanel, onNavigateToAdmin, onOpenAuth }
             </ul>
             <button
               type="button"
-              onClick={onNavigateToPanel}
+              onClick={() => onSelectPaidPlan({ id: 'pro', name: 'Professional', price: 79 })}
               className="btn-plan-select highlight"
             >
-              Choose Professional
+              Verify & Subscribe Pro ($79/mo)
             </button>
           </div>
 
@@ -424,10 +424,10 @@ export function LandingPage({ onNavigateToPanel, onNavigateToAdmin, onOpenAuth }
             </ul>
             <button
               type="button"
-              onClick={onNavigateToPanel}
+              onClick={() => onSelectPaidPlan({ id: 'business', name: 'Business', price: 199 })}
               className="btn-plan-select"
             >
-              Contact Sales
+              Verify & Subscribe Business ($199/mo)
             </button>
           </div>
         </div>
@@ -453,8 +453,8 @@ export function LandingPage({ onNavigateToPanel, onNavigateToAdmin, onOpenAuth }
 
           <div className="footer-col-links">
             <span className="footer-links-title">Quick Portals</span>
-            <button type="button" onClick={onNavigateToPanel} className="footer-link-btn">
-              App Workspace Panel (/Pannel)
+            <button type="button" onClick={onGetStartedFree} className="footer-link-btn">
+              Get Started Free
             </button>
             <button type="button" onClick={onOpenAuth} className="footer-link-btn">
               Account Login / Register

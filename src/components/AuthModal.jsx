@@ -59,9 +59,9 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, showToast }) {
       <div className="modal-card auth-modal">
         <div className="modal-header">
           <div className="modal-title-row">
-            <Database className="w-4 h-4 text-sky-400" />
+            <Lock className="w-4 h-4 text-primary" />
             <span className="modal-title">
-              {isSignUp ? 'Create User in users.csv' : 'Sign In via users.csv'}
+              {isSignUp ? 'Get Started — Create Account' : 'Sign In to Post Composer Pro'}
             </span>
           </div>
           <button type="button" onClick={onClose} className="modal-close-btn">
@@ -69,23 +69,23 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, showToast }) {
           </button>
         </div>
 
-        {/* Demo Fast Login Banner */}
+        {/* Quick Demo Credentials */}
         <div className="demo-accounts-box">
-          <span className="demo-label">Stored in users.csv:</span>
+          <span className="demo-label">Quick Demo Access:</span>
           <div className="demo-pills">
             <button
               type="button"
-              onClick={() => handleFillDemo('shavitdaloutra28@gmail.com', 'shavitdaloutra')}
+              onClick={() => handleFillDemo('daloutrashavit@gmail.com', 'shavitdaloutra')}
               className="demo-pill"
             >
-              shavitdaloutra28@gmail.com (Super Admin)
+              daloutrashavit@gmail.com (Super Admin)
             </button>
             <button
               type="button"
               onClick={() => handleFillDemo('sarah@tech.org', 'sarahSecure#2026')}
               className="demo-pill"
             >
-              sarah@tech.org
+              sarah@tech.org (Collaborator)
             </button>
           </div>
         </div>

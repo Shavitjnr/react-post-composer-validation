@@ -18,6 +18,7 @@ import { AdminAccessDenied } from './components/AdminAccessDenied';
 import { WorkspaceModal } from './components/WorkspaceModal';
 import { UpgradeModal } from './components/UpgradeModal';
 import { AuthModal } from './components/AuthModal';
+import { PaymentCheckoutModal } from './components/PaymentCheckoutModal';
 import { LandingPage } from './components/LandingPage';
 import { SuperAdminDashboard } from './components/SuperAdminDashboard';
 import { ClerkUserBridge } from './components/ClerkAuthControls';
@@ -47,6 +48,8 @@ function App({ hasClerkConfigured = false }) {
   const [isWorkspaceModalOpen, setIsWorkspaceModalOpen] = useState(false);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [selectedCheckoutPlan, setSelectedCheckoutPlan] = useState(null);
   const [toast, setToast] = useState(null);
 
   const showToast = (message, type = 'success') => {
@@ -93,6 +96,15 @@ function App({ hasClerkConfigured = false }) {
     effectiveUser?.orgId || clerkState.user?.orgId
   );
 
+  // STRICT URL PROTECTION: Nobody can view /Pannel without logging in / signing up first!
+  useEffect(() => {
+    if (currentRoute === 'panel' && !effectiveUser) {
+      navigate('home');
+      setIsAuthOpen(true);
+      showToast('Authentication required: Please sign in or click "Get Started Free" to access your workspace panel.', 'info');
+    }
+  }, [currentRoute, effectiveUser]);
+
   const handleSelectWorkspace = (workspaceId) => {
     workspaceService.setActiveWorkspaceId(workspaceId);
     setActiveWorkspace(workspaceService.getActiveWorkspace());
@@ -124,6 +136,30 @@ function App({ hasClerkConfigured = false }) {
     showToast(`Logged in as ${user.name}. Welcome to Post Composer Pro!`, 'success');
   };
 
+  // Only Get Started Free prompts login and moves to /Pannel
+  const handleGetStartedFree = () => {
+    if (effectiveUser) {
+      navigate('panel');
+    } else {
+      setIsAuthOpen(true);
+    }
+  };
+
+  // Transparent pricing plans trigger verified checkout flow (NEVER directly to panel)
+  const handleSelectPaidPlan = (plan) => {
+    setSelectedCheckoutPlan(plan);
+    setIsCheckoutOpen(true);
+  };
+
+  const handlePaymentSuccess = (plan, authenticatedUser) => {
+    if (authenticatedUser) {
+      setCurrentUser(authenticatedUser);
+    }
+    setActiveWorkspace(workspaceService.getActiveWorkspace());
+    showToast(`Payment of $${plan.price} verified! Plan upgraded to ${plan.name}.`, 'success');
+    navigate('panel');
+  };
+
   return (
     <>
       {/* Clerk User & Org Bridge */}
@@ -134,8 +170,9 @@ function App({ hasClerkConfigured = false }) {
 
       {currentRoute === 'home' && (
         <LandingPage
-          onNavigateToPanel={() => navigate('panel')}
+          onGetStartedFree={handleGetStartedFree}
           onOpenAuth={() => setIsAuthOpen(true)}
+          onSelectPaidPlan={handleSelectPaidPlan}
         />
       )}
 
@@ -316,6 +353,15 @@ function App({ hasClerkConfigured = false }) {
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
         onAuthSuccess={handleAuthSuccess}
+        showToast={showToast}
+      />
+
+      <PaymentCheckoutModal
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+        plan={selectedCheckoutPlan}
+        currentUser={effectiveUser}
+        onPaymentSuccess={handlePaymentSuccess}
         showToast={showToast}
       />
 
