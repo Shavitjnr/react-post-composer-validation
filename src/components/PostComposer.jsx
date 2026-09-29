@@ -3,8 +3,14 @@ import { PlatformSelector } from './PlatformSelector';
 import { CharacterCounter } from './CharacterCounter';
 import { PostPreview } from './PostPreview';
 import { ScheduleModal } from './ScheduleModal';
-import { validatePost, getPlatformLimit } from '../utils/validation';
-import { csvStorage } from '../utils/csvStorage';
+import { AddMediaModal } from './AddMediaModal';
+import { HashtagsModal } from './HashtagsModal';
+import { TagsModal } from './TagsModal';
+import { LocationCtaModal } from './LocationCtaModal';
+import { validateContentLength, getPlatformConfig } from '../constants/platformRules';
+import { postService } from '../services/postService';
+import { socialService } from '../services/socialService';
+import { workspaceService } from '../services/workspaceService';
 import {
   Smile,
   Hash,
@@ -13,20 +19,43 @@ import {
   Bookmark,
   Calendar,
   Send,
-  List
+  List,
+  Image,
+  Tag,
+  MapPin,
+  Link as LinkIcon,
+  ShieldCheck,
+  CheckCircle2,
+  X,
+  AlertCircle
 } from 'lucide-react';
 
-const COMMON_HASHTAGS = ['#Engineering', '#Architecture', '#Tech', '#Software', '#React', '#NextJS'];
+const COMMON_HASHTAGS = ['#Engineering', '#Architecture', '#Tech', '#Software', '#React', '#SaaS'];
 const CURATED_EMOJIS = ['🚀', '💡', '🔥', '✨', '🎙️', '👍', '📈', '👏', '🎯', '🧵', '😊', '🙌', '💼', '📊', '⚡'];
 
-export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSaved }) {
-  const [platform, setPlatform] = useState('Twitter');
+export function PostComposer({
+  currentUser,
+  activeWorkspace,
+  showToast,
+  onPostCreated,
+  onDraftSaved
+}) {
+  const [platform, setPlatform] = useState('Instagram');
   const [content, setContent] = useState('');
+  const [attachedMedia, setAttachedMedia] = useState(null);
+  const [assignedTags, setAssignedTags] = useState(['Product Launch']);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [showMediaModal, setShowMediaModal] = useState(false);
+  const [showHashtagsModal, setShowHashtagsModal] = useState(false);
+  const [showTagsModal, setShowTagsModal] = useState(false);
+  const [locationCtaMode, setLocationCtaMode] = useState(null); // 'location' or 'cta'
 
-  // Dynamic Validation Engine
-  const validation = validatePost(content, platform);
+  // Centralized Validation Engine
+  const validation = validateContentLength(content, platform);
+
+  const connectedAccounts = socialService.getConnectedAccounts(activeWorkspace?.ID);
+  const isPlatformConnected = connectedAccounts.some((a) => a.Platform === platform);
 
   const insertEmoji = (emoji) => {
     setContent((prev) => (prev.endsWith(' ') || prev.length === 0 ? prev : prev + ' ') + emoji + ' ');
@@ -37,7 +66,7 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
   };
 
   const insertMention = () => {
-    const handle = prompt('Enter handle or username without @:');
+    const handle = prompt('Enter username without @:');
     if (handle && handle.trim()) {
       setContent((prev) => (prev.endsWith(' ') || prev.length === 0 ? prev : prev + ' ') + `@${handle.trim()} `);
     }
@@ -50,78 +79,110 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
   const handleClear = () => {
     if (content.length > 0 && confirm('Clear the current text in the post editor?')) {
       setContent('');
+      setAttachedMedia(null);
     }
   };
 
-  // Publish immediate post -> saves to posts.csv
+  const handleToggleTag = (tag) => {
+    setAssignedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
+    );
+  };
+
+  // Immediate Publish (Demo Mode Simulated)
   const handlePublish = () => {
     if (!validation.isValid) return;
 
-    csvStorage.savePost({
-      userEmail: currentUser?.email || 'alex@example.com',
+    const res = postService.publishPost({
+      content,
       platform,
-      content: content.trim(),
-      status: 'Published',
-      charCount: validation.charCount,
-      limit: validation.limit,
+      authorEmail: currentUser?.email || 'alex@example.com',
+      mediaUrl: attachedMedia?.Url || '',
+      tags: assignedTags.join(','),
     });
 
-    showToast(`Post published and recorded to posts.csv for ${platform}.`, 'success');
+    showToast(res.message, 'success');
     setContent('');
+    setAttachedMedia(null);
     if (onPostCreated) onPostCreated();
   };
 
-  // Save to drafts.csv
+  // Save to Drafts
   const handleSaveDraft = () => {
     if (!content.trim()) return;
 
-    csvStorage.saveDraft({
-      userEmail: currentUser?.email || 'alex@example.com',
+    postService.saveDraft({
+      content,
       platform,
-      content: content.trim(),
-      isFavorite: false,
+      userEmail: currentUser?.email || 'alex@example.com',
     });
 
-    showToast(`Draft saved to drafts.csv for ${platform}.`, 'success');
+    showToast(`Draft saved for ${platform} in ${activeWorkspace?.Name || 'workspace'}.`, 'success');
     setContent('');
+    setAttachedMedia(null);
     if (onDraftSaved) onDraftSaved();
   };
 
-  // Schedule future release -> saves to posts.csv with Scheduled status
+  // Submit for Review (Approval Workflow)
+  const handleSubmitReview = () => {
+    if (!validation.isValid) return;
+
+    postService.submitForReview({
+      content,
+      platform,
+      authorEmail: currentUser?.email || 'alex@example.com',
+    });
+
+    showToast(`Post submitted for managerial review!`, 'info');
+    setContent('');
+    setAttachedMedia(null);
+    if (onPostCreated) onPostCreated();
+  };
+
+  // Confirm Schedule
   const handleConfirmSchedule = (scheduledAt) => {
     setShowScheduleModal(false);
 
-    csvStorage.savePost({
-      userEmail: currentUser?.email || 'alex@example.com',
+    const res = postService.schedulePost({
+      content,
       platform,
-      content: content.trim(),
-      status: 'Scheduled',
-      charCount: validation.charCount,
-      limit: validation.limit,
+      authorEmail: currentUser?.email || 'alex@example.com',
       scheduledAt,
     });
 
-    showToast(`Post scheduled for ${scheduledAt} and recorded to posts.csv.`, 'success');
+    if (!res.success) {
+      showToast(res.error, 'error');
+      return;
+    }
+
+    showToast(`Post successfully queued for ${new Date(scheduledAt).toLocaleString()}!`, 'success');
     setContent('');
+    setAttachedMedia(null);
     if (onPostCreated) onPostCreated();
   };
 
   return (
     <div className="composer-layout-grid">
-      {/* Left: Classic Editorial Composer Card */}
+      {/* Left: Classic SaaS Editorial Composer Card */}
       <div className="composer-card-main">
         {/* Header */}
         <div className="composer-card-header">
-          <div className="header-pill">Controlled Component Engine</div>
-          <h2 className="composer-heading">
-            Post Composer
-          </h2>
+          <div className="header-meta-flex">
+            <div className="header-pill">
+              Workspace: {activeWorkspace?.Name || 'Hostego'}
+            </div>
+            <div className="connection-status-pill">
+              <span className={`status-dot ${isPlatformConnected ? 'online' : 'demo'}`} />
+              <span>{isPlatformConnected ? `${platform} Connected` : `${platform} (Demo Mode)`}</span>
+            </div>
+          </div>
+          <h2 className="composer-heading">Social Post Composer</h2>
           <p className="composer-subheading">
-            Validate platform character limits in real-time and store records into structured CSV files.
+            Compose, format, validate, and orchestrate publications across all five supported social networks.
           </p>
         </div>
 
-        {/* 1. Platform Switcher */}
+        {/* 1. Target Platform Channel Selector */}
         <PlatformSelector
           selectedPlatform={platform}
           onSelectPlatform={setPlatform}
@@ -131,10 +192,10 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
         <div className="composer-editor-wrapper">
           <div className="editor-label-bar">
             <label htmlFor="composer-textarea" className="editor-label">
-              Composition Text
+              Post Composition Text
             </label>
             <span className="editor-hint">
-              Synchronized with preview and CSV storage
+              Synchronized live with preview mockup & validation rules
             </span>
           </div>
 
@@ -144,14 +205,111 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
               rows={6}
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder={`Enter your ${platform} publication content here... (Maximum limit: ${validation.limit} characters)`}
+              placeholder={`Write your ${platform} publication here... (Max limit: ${validation.limit} characters)`}
               className="composer-textarea"
             />
 
-            {/* Professional Text Utility Toolbar with Emoji Button */}
+            {/* Attached Media Asset Chip */}
+            {attachedMedia && (
+              <div className="attached-media-banner">
+                <div className="media-chip-info">
+                  <Image className="w-4 h-4 text-primary" />
+                  <span>Attached: <strong>{attachedMedia.Title}</strong> ({attachedMedia.SizeMB} MB)</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setAttachedMedia(null)}
+                  className="btn-remove-attachment"
+                  title="Remove attached asset"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
+            {/* Assigned Tags Badges */}
+            {assignedTags.length > 0 && (
+              <div className="composer-tags-strip">
+                <span className="tags-strip-label">Tags:</span>
+                {assignedTags.map((t) => (
+                  <span key={t} className="composer-tag-chip">
+                    #{t}
+                    <button type="button" onClick={() => handleToggleTag(t)}>×</button>
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Professional Text Utility Toolbar */}
             <div className="editor-toolbar">
               <div className="toolbar-left">
-                {/* Emoji button replacing Quote button */}
+                {/* + Add Media Button */}
+                <button
+                  type="button"
+                  onClick={() => setShowMediaModal(true)}
+                  className="toolbar-btn"
+                  title="Attach image or video from media library"
+                >
+                  <Image className="w-3.5 h-3.5 text-primary" />
+                  <span>+ Media</span>
+                </button>
+
+                {/* + Add Hashtag Button */}
+                <button
+                  type="button"
+                  onClick={() => setShowHashtagsModal(true)}
+                  className="toolbar-btn"
+                  title="Open hashtag vault"
+                >
+                  <Hash className="w-3.5 h-3.5 text-slate-500" />
+                  <span>+ Hashtag</span>
+                </button>
+
+                {/* + Add Mention Button */}
+                <button
+                  type="button"
+                  onClick={insertMention}
+                  className="toolbar-btn"
+                  title="Insert profile mention"
+                >
+                  <AtSign className="w-3.5 h-3.5 text-slate-500" />
+                  <span>+ Mention</span>
+                </button>
+
+                {/* + Add Tag Button */}
+                <button
+                  type="button"
+                  onClick={() => setShowTagsModal(true)}
+                  className="toolbar-btn"
+                  title="Assign organizational tags"
+                >
+                  <Tag className="w-3.5 h-3.5 text-slate-500" />
+                  <span>+ Tag</span>
+                </button>
+
+                {/* + Add Location */}
+                <button
+                  type="button"
+                  onClick={() => setLocationCtaMode('location')}
+                  className="toolbar-btn"
+                  title="Append location marker"
+                >
+                  <MapPin className="w-3.5 h-3.5 text-slate-500" />
+                  <span>+ Location</span>
+                </button>
+
+                {/* + Add CTA */}
+                <button
+                  type="button"
+                  onClick={() => setLocationCtaMode('cta')}
+                  className="toolbar-btn"
+                  title="Append Call-To-Action link"
+                >
+                  <LinkIcon className="w-3.5 h-3.5 text-slate-500" />
+                  <span>+ CTA</span>
+                </button>
+
+                {/* Emoji button */}
                 <button
                   type="button"
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
@@ -162,26 +320,18 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
                   <span>Emoji</span>
                 </button>
 
+                {/* Bullet */}
                 <button
                   type="button"
                   onClick={insertBullet}
                   className="toolbar-btn"
                   title="Insert Bullet Point"
                 >
-                  <List className="w-3.5 h-3.5" />
+                  <List className="w-3.5 h-3.5 text-slate-500" />
                   <span>Bullet</span>
                 </button>
 
-                <button
-                  type="button"
-                  onClick={insertMention}
-                  className="toolbar-btn"
-                  title="Insert Mention"
-                >
-                  <AtSign className="w-3.5 h-3.5" />
-                  <span>Mention</span>
-                </button>
-
+                {/* Clear */}
                 <button
                   type="button"
                   onClick={handleClear}
@@ -194,7 +344,7 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
                 </button>
               </div>
 
-              {/* Hashtag Quick Chips */}
+              {/* Quick Hashtag Chips */}
               <div className="toolbar-right">
                 <Hash className="w-3 h-3 text-slate-400" />
                 {COMMON_HASHTAGS.slice(0, 4).map((tag) => (
@@ -243,10 +393,21 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
             className="btn-draft"
           >
             <Bookmark className="w-4 h-4" />
-            <span>Save to drafts.csv</span>
+            <span>Save Draft</span>
           </button>
 
           <div className="actions-right">
+            <button
+              type="button"
+              onClick={handleSubmitReview}
+              disabled={!validation.isValid}
+              className="btn-secondary"
+              title="Submit for managerial review and approval"
+            >
+              <ShieldCheck className="w-4 h-4 text-primary" />
+              <span>Submit for Review</span>
+            </button>
+
             <button
               type="button"
               onClick={() => setShowScheduleModal(true)}
@@ -264,27 +425,58 @@ export function PostComposer({ currentUser, showToast, onPostCreated, onDraftSav
               className="btn-publish"
             >
               <Send className="w-4 h-4" />
-              <span>Publish to {platform}</span>
+              <span>Publish Now (Demo)</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Right: Platform Mockup Panel */}
+      {/* Right: Live Platform Mockup Sticky Preview */}
       <div className="preview-panel-sticky">
         <PostPreview
           platform={platform}
           content={content}
           authorName={currentUser?.name || 'Alex Morgan'}
+          mediaUrl={attachedMedia?.Url || null}
         />
       </div>
 
-      {/* Schedule Picker Modal */}
+      {/* MODALS */}
       <ScheduleModal
         isOpen={showScheduleModal}
         onClose={() => setShowScheduleModal(false)}
-        onConfirmSchedule={handleConfirmSchedule}
+        onConfirm={handleConfirmSchedule}
         platform={platform}
+      />
+
+      <AddMediaModal
+        isOpen={showMediaModal}
+        onClose={() => setShowMediaModal(false)}
+        onSelectMedia={(media) => setAttachedMedia(media)}
+        showToast={showToast}
+      />
+
+      <HashtagsModal
+        isOpen={showHashtagsModal}
+        onClose={() => setShowHashtagsModal(false)}
+        onInsertHashtag={insertHashtag}
+        showToast={showToast}
+      />
+
+      <TagsModal
+        isOpen={showTagsModal}
+        onClose={() => setShowTagsModal(false)}
+        selectedTags={assignedTags}
+        onToggleTag={handleToggleTag}
+        showToast={showToast}
+      />
+
+      <LocationCtaModal
+        isOpen={Boolean(locationCtaMode)}
+        onClose={() => setLocationCtaMode(null)}
+        mode={locationCtaMode}
+        onApply={(text) => setContent((prev) => prev + text)}
+        showToast={showToast}
       />
     </div>
   );

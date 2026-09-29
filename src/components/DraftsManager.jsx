@@ -1,22 +1,24 @@
 import React, { useState } from 'react';
-import { csvStorage } from '../utils/csvStorage';
-import { PLATFORMS } from '../utils/validation';
 import {
   FileText,
   Star,
   Copy,
   Trash2,
-  Search
+  Search,
+  PenSquare,
+  Plus
 } from 'lucide-react';
+import { postService } from '../services/postService';
+import { PLATFORM_RULES } from '../constants/platformRules';
 
-export function DraftsManager({ onOpenComposerWithContent, showToast }) {
-  const [drafts, setDrafts] = useState(() => csvStorage.getDrafts());
+export function DraftsManager({ onOpenComposerWithContent, onNavigateToComposer, showToast }) {
+  const [drafts, setDrafts] = useState(() => postService.getDrafts());
   const [search, setSearch] = useState('');
   const [platformFilter, setPlatformFilter] = useState('All');
   const [onlyFavorites, setOnlyFavorites] = useState(false);
 
   const refreshDrafts = () => {
-    setDrafts(csvStorage.getDrafts());
+    setDrafts(postService.getDrafts());
   };
 
   const filteredDrafts = drafts.filter((d) => {
@@ -27,24 +29,19 @@ export function DraftsManager({ onOpenComposerWithContent, showToast }) {
   });
 
   const handleToggleFavorite = (id) => {
-    csvStorage.toggleDraftFavorite(id);
+    postService.toggleFavoriteDraft(id);
     refreshDrafts();
   };
 
   const handleDuplicate = (draft) => {
-    csvStorage.saveDraft({
-      userEmail: draft.UserEmail,
-      platform: draft.Platform,
-      content: `${draft.Content} (Copy)`,
-      isFavorite: false,
-    });
-    showToast('Draft duplicated in drafts.csv', 'success');
+    postService.duplicateDraft(draft);
+    showToast('Draft duplicated successfully!', 'success');
     refreshDrafts();
   };
 
   const handleDelete = (id) => {
-    if (confirm('Delete this draft from drafts.csv?')) {
-      csvStorage.deleteDraft(id);
+    if (confirm('Delete this draft permanently?')) {
+      postService.deleteDraft(id);
       showToast('Draft deleted', 'info');
       refreshDrafts();
     }
@@ -54,35 +51,38 @@ export function DraftsManager({ onOpenComposerWithContent, showToast }) {
     <div className="section-container">
       <div className="section-header-row">
         <div>
-          <h2 className="section-title">Drafts Repository (drafts.csv)</h2>
+          <div className="header-pill">Editorial Ideas & Staging</div>
+          <h2 className="section-title">Drafts Library</h2>
           <p className="section-subtitle">
-            Saved drafts are stored in <code>data/drafts.csv</code> and can be reviewed, edited, or duplicated.
+            Saved drafts are isolated per workspace and can be reviewed, edited, duplicated, or scheduled.
           </p>
+        </div>
+
+        <div className="section-actions-group">
+          {onNavigateToComposer && (
+            <button
+              type="button"
+              onClick={onNavigateToComposer}
+              className="btn-primary"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create New Draft</span>
+            </button>
+          )}
         </div>
       </div>
 
       {/* Filter and Search Bar */}
       <div className="filter-search-card">
-        <div className="search-input-box">
-          <Search className="w-4 h-4 text-slate-500" />
-          <input
-            type="text"
-            placeholder="Search within drafts..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="search-field"
-          />
-        </div>
-
         <div className="filter-pills-row">
-          {['All', ...Object.keys(PLATFORMS)].map((plt) => (
+          {['All', 'Instagram', 'Facebook', 'LinkedIn', 'Twitter', 'YouTube'].map((plat) => (
             <button
-              key={plt}
+              key={plat}
               type="button"
-              onClick={() => setPlatformFilter(plt)}
-              className={`filter-pill-btn ${platformFilter === plt ? 'active' : ''}`}
+              onClick={() => setPlatformFilter(plat)}
+              className={`filter-pill-btn ${platformFilter === plat ? 'active' : ''}`}
             >
-              {plt}
+              {plat}
             </button>
           ))}
 
@@ -91,69 +91,100 @@ export function DraftsManager({ onOpenComposerWithContent, showToast }) {
             onClick={() => setOnlyFavorites(!onlyFavorites)}
             className={`filter-pill-btn fav-btn ${onlyFavorites ? 'active' : ''}`}
           >
-            <Star className={`w-3.5 h-3.5 ${onlyFavorites ? 'fill-amber text-amber' : ''}`} />
-            <span>Starred</span>
+            <Star className={`w-3.5 h-3.5 ${onlyFavorites ? 'fill-amber-400 text-amber-400' : ''}`} />
+            <span>Favorites</span>
           </button>
+        </div>
+
+        <div className="search-input-box">
+          <Search className="w-4 h-4 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search drafts..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="search-field"
+          />
         </div>
       </div>
 
-      {/* Drafts Grid */}
-      {filteredDrafts.length === 0 ? (
-        <div className="empty-state-box">
-          <FileText className="w-8 h-8 text-slate-500 mb-2" />
-          <p>No drafts match your selected criteria.</p>
-        </div>
-      ) : (
-        <div className="cards-grid-3">
-          {filteredDrafts.map((d) => {
-            const cfg = PLATFORMS[d.Platform] || PLATFORMS.Twitter;
+      {/* Drafts Cards Grid */}
+      <div className="cards-grid-3">
+        {filteredDrafts.length === 0 ? (
+          <div className="empty-state-box" style={{ gridColumn: '1 / -1' }}>
+            <FileText className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+            <p>No drafts match your current filter.</p>
+          </div>
+        ) : (
+          filteredDrafts.map((d) => {
+            const cfg = PLATFORM_RULES[d.Platform] || { color: '#0f172a', badge: d.Platform };
             const isFav = d.IsFavorite === 'true';
 
             return (
               <div key={d.ID} className="draft-item-card">
-                <div>
-                  <div className="draft-card-header">
-                    <span className="platform-tag" style={{ backgroundColor: cfg.color }}>
-                      {d.Platform}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => handleToggleFavorite(d.ID)}
-                      className="star-fav-btn"
-                      title={isFav ? 'Remove Star' : 'Mark as Starred'}
-                    >
-                      <Star className={`w-4 h-4 ${isFav ? 'fill-amber text-amber' : 'text-slate-500'}`} />
-                    </button>
-                  </div>
-                  <p className="draft-body-text">{d.Content}</p>
+                <div className="draft-card-header">
+                  <span
+                    className="platform-tag"
+                    style={{ backgroundColor: cfg.color }}
+                  >
+                    {cfg.name || d.Platform}
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={() => handleToggleFavorite(d.ID)}
+                    className="star-fav-btn"
+                    title={isFav ? 'Remove from favorites' : 'Mark as favorite'}
+                  >
+                    <Star
+                      className={`w-4 h-4 ${isFav ? 'fill-amber text-amber' : 'text-slate-400'}`}
+                    />
+                  </button>
                 </div>
 
+                <p className="draft-body-text">{d.Content}</p>
+
                 <div className="draft-card-footer">
-                  <span className="draft-timestamp">{d.CreatedAt}</span>
+                  <span className="draft-timestamp">{d.CreatedAt ? d.CreatedAt.slice(0, 16) : '—'}</span>
+
                   <div className="draft-actions">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (onOpenComposerWithContent) {
+                          onOpenComposerWithContent(d.Content, d.Platform);
+                        }
+                      }}
+                      className="btn-icon-action"
+                      title="Edit in Post Composer"
+                    >
+                      <PenSquare className="w-3.5 h-3.5 text-primary" />
+                    </button>
+
                     <button
                       type="button"
                       onClick={() => handleDuplicate(d)}
                       className="btn-icon-action"
                       title="Duplicate draft"
                     >
-                      <Copy className="w-3.5 h-3.5" />
+                      <Copy className="w-3.5 h-3.5 text-slate-500" />
                     </button>
+
                     <button
                       type="button"
                       onClick={() => handleDelete(d.ID)}
                       className="btn-icon-action delete"
                       title="Delete draft"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 className="w-3.5 h-3.5 text-rose-500" />
                     </button>
                   </div>
                 </div>
               </div>
             );
-          })}
-        </div>
-      )}
+          })
+        )}
+      </div>
     </div>
   );
 }

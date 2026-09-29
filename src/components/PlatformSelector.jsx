@@ -1,19 +1,19 @@
 import React from 'react';
-import { PLATFORMS } from '../utils/validation';
+import { PLATFORM_RULES } from '../constants/platformRules';
 
 export function PlatformSelector({ selectedPlatform, onSelectPlatform }) {
-  const platformKeys = Object.keys(PLATFORMS);
+  const platformKeys = Object.keys(PLATFORM_RULES);
 
   return (
     <div className="platform-selection-group">
       <div className="section-label-row">
-        <label className="section-label">Target Platform</label>
-        <span className="section-hint">Validation limit adjusts dynamically</span>
+        <label className="section-label">Target Platform Channel</label>
+        <span className="section-hint">Rules strictly enforced per social network</span>
       </div>
 
-      <div className="platform-buttons-grid">
+      <div className="platform-buttons-grid grid-5-cols">
         {platformKeys.map((key) => {
-          const cfg = PLATFORMS[key];
+          const cfg = PLATFORM_RULES[key];
           const isSelected = selectedPlatform === key;
 
           return (
@@ -31,12 +31,12 @@ export function PlatformSelector({ selectedPlatform, onSelectPlatform }) {
                   {cfg.badge}
                 </span>
                 <span className="platform-limit-tag">
-                  {cfg.limit.toLocaleString()}
+                  {cfg.characterLimit.toLocaleString()}
                 </span>
               </div>
               <div className="platform-btn-info">
                 <span className="platform-name">{cfg.name}</span>
-                <span className="platform-limit-text">Max {cfg.limit} chars</span>
+                <span className="platform-limit-text">Max {cfg.characterLimit} chars</span>
               </div>
             </button>
           );

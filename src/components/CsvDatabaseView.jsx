@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { csvStorage, downloadCSVFile } from '../utils/csvStorage';
+import { csvRepository } from '../repositories/csvRepository';
 import {
   Database,
   Download,
@@ -16,18 +17,28 @@ import {
   Lock,
   Shield,
   CheckCircle2,
-  Users
+  Users,
+  Building2,
+  Share2,
+  Flag,
+  Image,
+  ShieldCheck
 } from 'lucide-react';
 
 export function CsvDatabaseView({ showToast }) {
-  const [activeDataset, setActiveDataset] = useState('users'); // 'users', 'posts', 'drafts'
+  const [activeDataset, setActiveDataset] = useState('users'); // 'users', 'posts', 'drafts', 'workspaces', 'accounts', 'campaigns', 'media', 'audit'
   const [showRawText, setShowRawText] = useState(false);
-  const [revealPasswords, setRevealPasswords] = useState(true);
+  const [revealPasswords, setRevealPasswords] = useState(false); // default masked for security
 
   // Users state so additions/deletions update immediately
   const [usersList, setUsersList] = useState(() => csvStorage.getUsers());
   const [postsList, setPostsList] = useState(() => csvStorage.getPosts());
   const [draftsList, setDraftsList] = useState(() => csvStorage.getDrafts());
+  const [workspacesList, setWorkspacesList] = useState(() => csvRepository.getWorkspaces());
+  const [accountsList, setAccountsList] = useState(() => csvRepository.getSocialAccounts());
+  const [campaignsList, setCampaignsList] = useState(() => csvRepository.getCampaigns());
+  const [mediaList, setMediaList] = useState(() => csvRepository.getMedia());
+  const [auditList, setAuditList] = useState(() => csvRepository.getAuditLogs());
 
   // Add Member Modal State
   const [showAddModal, setShowAddModal] = useState(false);
@@ -43,6 +54,11 @@ export function CsvDatabaseView({ showToast }) {
     setUsersList(csvStorage.getUsers());
     setPostsList(csvStorage.getPosts());
     setDraftsList(csvStorage.getDrafts());
+    setWorkspacesList(csvRepository.getWorkspaces());
+    setAccountsList(csvRepository.getSocialAccounts());
+    setCampaignsList(csvRepository.getCampaigns());
+    setMediaList(csvRepository.getMedia());
+    setAuditList(csvRepository.getAuditLogs());
   };
 
   const handleDownloadActiveCSV = () => {
@@ -51,13 +67,28 @@ export function CsvDatabaseView({ showToast }) {
 
     if (activeDataset === 'users') {
       content = csvStorage.getUsersCSV();
-      filename = `users_and_passwords_${new Date().toISOString().slice(0, 10)}.csv`;
+      filename = `demo_users_${new Date().toISOString().slice(0, 10)}.csv`;
     } else if (activeDataset === 'posts') {
       content = csvStorage.getPostsCSV();
       filename = `posts_dataset_${new Date().toISOString().slice(0, 10)}.csv`;
-    } else {
+    } else if (activeDataset === 'drafts') {
       content = csvStorage.getDraftsCSV();
       filename = `drafts_dataset_${new Date().toISOString().slice(0, 10)}.csv`;
+    } else if (activeDataset === 'workspaces') {
+      content = csvRepository.getWorkspacesCSV();
+      filename = `workspaces_${new Date().toISOString().slice(0, 10)}.csv`;
+    } else if (activeDataset === 'accounts') {
+      content = csvRepository.getSocialAccountsCSV();
+      filename = `social_accounts_${new Date().toISOString().slice(0, 10)}.csv`;
+    } else if (activeDataset === 'campaigns') {
+      content = csvRepository.getCampaignsCSV();
+      filename = `campaigns_${new Date().toISOString().slice(0, 10)}.csv`;
+    } else if (activeDataset === 'media') {
+      content = csvRepository.getMediaCSV();
+      filename = `media_assets_${new Date().toISOString().slice(0, 10)}.csv`;
+    } else {
+      content = csvRepository.getAuditLogsCSV();
+      filename = `audit_logs_${new Date().toISOString().slice(0, 10)}.csv`;
     }
 
     downloadCSVFile(content, filename);
@@ -65,10 +96,11 @@ export function CsvDatabaseView({ showToast }) {
   };
 
   const handleResetDefaults = () => {
-    if (confirm('Reset all CSV datasets (users with passwords, posts, and drafts) to initial defaults?')) {
+    if (confirm('Reset all CSV datasets to initial demo seed?')) {
       csvStorage.resetAllToDefault();
+      csvRepository.resetAllRepositories();
       refreshData();
-      showToast('All CSV files reset to default demo data (3 initial users restored)', 'info');
+      showToast('All CSV files reset to default demo seed', 'info');
     }
   };
 
@@ -128,7 +160,17 @@ export function CsvDatabaseView({ showToast }) {
       ? csvStorage.getUsersCSV()
       : activeDataset === 'posts'
       ? csvStorage.getPostsCSV()
-      : csvStorage.getDraftsCSV();
+      : activeDataset === 'drafts'
+      ? csvStorage.getDraftsCSV()
+      : activeDataset === 'workspaces'
+      ? csvRepository.getWorkspacesCSV()
+      : activeDataset === 'accounts'
+      ? csvRepository.getSocialAccountsCSV()
+      : activeDataset === 'campaigns'
+      ? csvRepository.getCampaignsCSV()
+      : activeDataset === 'media'
+      ? csvRepository.getMediaCSV()
+      : csvRepository.getAuditLogsCSV();
 
   return (
     <div className="section-container">
@@ -137,11 +179,11 @@ export function CsvDatabaseView({ showToast }) {
         <div>
           <div className="csv-badge-title">
             <KeyRound className="w-4 h-4 text-emerald-600" />
-            <span>CSV Data Persistence Engine</span>
+            <span>Development / Demo Data Inspector</span>
           </div>
           <h2 className="section-title">Active CSV Database Inspector</h2>
           <p className="section-subtitle">
-            All user authentication, passwords, social media posts, and drafts are stored and managed in standard CSV format.
+            Local RFC-4180 CSV tables enabling ₹0 zero-budget development. (Production connects to Supabase PostgreSQL & RLS).
           </p>
         </div>
 
@@ -189,7 +231,7 @@ export function CsvDatabaseView({ showToast }) {
           className={`csv-tab-btn ${activeDataset === 'users' ? 'active' : ''}`}
         >
           <KeyRound className="w-4 h-4 text-amber-500" />
-          <span>users.csv ({usersList.length} Users & Passwords)</span>
+          <span>users.csv ({usersList.length})</span>
         </button>
 
         <button
@@ -198,7 +240,7 @@ export function CsvDatabaseView({ showToast }) {
           className={`csv-tab-btn ${activeDataset === 'posts' ? 'active' : ''}`}
         >
           <FileSpreadsheet className="w-4 h-4 text-sky-500" />
-          <span>posts.csv ({postsList.length} Posts)</span>
+          <span>posts.csv ({postsList.length})</span>
         </button>
 
         <button
@@ -207,34 +249,64 @@ export function CsvDatabaseView({ showToast }) {
           className={`csv-tab-btn ${activeDataset === 'drafts' ? 'active' : ''}`}
         >
           <Database className="w-4 h-4 text-indigo-500" />
-          <span>drafts.csv ({draftsList.length} Drafts)</span>
+          <span>drafts.csv ({draftsList.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveDataset('workspaces')}
+          className={`csv-tab-btn ${activeDataset === 'workspaces' ? 'active' : ''}`}
+        >
+          <Building2 className="w-4 h-4 text-emerald-500" />
+          <span>workspaces.csv ({workspacesList.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveDataset('accounts')}
+          className={`csv-tab-btn ${activeDataset === 'accounts' ? 'active' : ''}`}
+        >
+          <Share2 className="w-4 h-4 text-primary" />
+          <span>accounts.csv ({accountsList.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveDataset('campaigns')}
+          className={`csv-tab-btn ${activeDataset === 'campaigns' ? 'active' : ''}`}
+        >
+          <Flag className="w-4 h-4 text-purple-500" />
+          <span>campaigns.csv ({campaignsList.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveDataset('media')}
+          className={`csv-tab-btn ${activeDataset === 'media' ? 'active' : ''}`}
+        >
+          <Image className="w-4 h-4 text-teal-500" />
+          <span>media.csv ({mediaList.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveDataset('audit')}
+          className={`csv-tab-btn ${activeDataset === 'audit' ? 'active' : ''}`}
+        >
+          <ShieldCheck className="w-4 h-4 text-slate-500" />
+          <span>audit_logs.csv ({auditList.length})</span>
         </button>
 
         <div className="csv-tab-toggles">
           {activeDataset === 'users' && (
-            <>
-              <button
-                type="button"
-                onClick={() => {
-                  setFormError('');
-                  setShowAddModal(true);
-                }}
-                className="toggle-raw-btn"
-                title="Add new member to users.csv"
-              >
-                <UserPlus className="w-3.5 h-3.5 text-primary" />
-                <span>Add Member</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setRevealPasswords(!revealPasswords)}
-                className="toggle-raw-btn"
-              >
-                {revealPasswords ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                <span>{revealPasswords ? 'Mask Passwords' : 'Show Passwords'}</span>
-              </button>
-            </>
+            <button
+              type="button"
+              onClick={() => setRevealPasswords(!revealPasswords)}
+              className="toggle-raw-btn"
+            >
+              {revealPasswords ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+              <span>{revealPasswords ? 'Mask Passwords' : 'Show Demo Passwords'}</span>
+            </button>
           )}
 
           <button
@@ -242,7 +314,7 @@ export function CsvDatabaseView({ showToast }) {
             onClick={() => setShowRawText(!showRawText)}
             className="toggle-raw-btn"
           >
-            <span>{showRawText ? 'View Table Format' : 'View Raw CSV Text'}</span>
+            <span>{showRawText ? 'View Table Format' : 'View Raw CSV'}</span>
           </button>
         </div>
       </div>
@@ -258,15 +330,14 @@ export function CsvDatabaseView({ showToast }) {
       ) : (
         /* TABLE VIEW */
         <div className="csv-table-card">
-          {/* USERS DATASET (WITH PASSWORDS & ADD BUTTON) */}
+          {/* 1. USERS DATASET */}
           {activeDataset === 'users' && (
             <div>
-              {/* Informational Sub-Bar */}
               <div className="users-table-header-bar">
                 <div className="users-summary-info">
                   <Users className="w-4 h-4 text-primary" />
                   <span>
-                    <strong>{usersList.length} Authenticated Accounts</strong> stored directly in <code>users.csv</code>
+                    <strong>{usersList.length} Demo Accounts</strong> stored in <code>users.csv</code> (3 initial defaults + live members)
                   </span>
                 </div>
                 <button
@@ -289,7 +360,7 @@ export function CsvDatabaseView({ showToast }) {
                       <th>User ID</th>
                       <th>Full Name</th>
                       <th>Email Address</th>
-                      <th>Stored Password (CSV)</th>
+                      <th>Demo Password</th>
                       <th>Role</th>
                       <th>Created At</th>
                       <th style={{ textAlign: 'center' }}>Actions</th>
@@ -315,7 +386,7 @@ export function CsvDatabaseView({ showToast }) {
                             type="button"
                             onClick={() => handleDeleteUser(u)}
                             className="btn-icon-action delete"
-                            title={`Delete ${u.Name} from users.csv`}
+                            title={`Delete ${u.Name}`}
                             disabled={usersList.length <= 1}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -329,7 +400,7 @@ export function CsvDatabaseView({ showToast }) {
             </div>
           )}
 
-          {/* POSTS DATASET */}
+          {/* 2. POSTS DATASET */}
           {activeDataset === 'posts' && (
             <div className="table-wrapper">
               <table className="posts-data-table">
@@ -337,7 +408,7 @@ export function CsvDatabaseView({ showToast }) {
                   <tr>
                     <th>Post ID</th>
                     <th>Author</th>
-                    <th>Platform</th>
+                    <th>Channel</th>
                     <th>Status</th>
                     <th>Chars / Limit</th>
                     <th>Schedule Date</th>
@@ -350,12 +421,10 @@ export function CsvDatabaseView({ showToast }) {
                       <td className="font-mono text-slate-muted">{p.ID}</td>
                       <td className="text-slate-muted">{p.UserEmail}</td>
                       <td>
-                        <span className="platform-tag font-bold" style={{ backgroundColor: p.Platform === 'Twitter' ? '#0284c7' : '#0a66c2' }}>
-                          {p.Platform}
-                        </span>
+                        <span className="platform-tag font-bold">{p.Platform}</span>
                       </td>
                       <td>
-                        <span className={`status-pill ${p.Status.toLowerCase()}`}>{p.Status}</span>
+                        <span className={`status-pill ${p.Status.toLowerCase().replace(/\s+/g, '-')}`}>{p.Status}</span>
                       </td>
                       <td className="font-mono">{p.CharCount} / {p.Limit}</td>
                       <td className="text-slate-muted font-mono">{p.ScheduledAt || 'Immediate'}</td>
@@ -369,7 +438,7 @@ export function CsvDatabaseView({ showToast }) {
             </div>
           )}
 
-          {/* DRAFTS DATASET */}
+          {/* 3. DRAFTS DATASET */}
           {activeDataset === 'drafts' && (
             <div className="table-wrapper">
               <table className="posts-data-table">
@@ -377,7 +446,7 @@ export function CsvDatabaseView({ showToast }) {
                   <tr>
                     <th>Draft ID</th>
                     <th>Author</th>
-                    <th>Platform</th>
+                    <th>Channel</th>
                     <th>Favorite?</th>
                     <th>Created At</th>
                     <th>Draft Content</th>
@@ -389,9 +458,7 @@ export function CsvDatabaseView({ showToast }) {
                       <td className="font-mono text-slate-muted">{d.ID}</td>
                       <td className="text-slate-muted">{d.UserEmail}</td>
                       <td>
-                        <span className="platform-tag font-bold" style={{ backgroundColor: d.Platform === 'Twitter' ? '#0284c7' : '#0a66c2' }}>
-                          {d.Platform}
-                        </span>
+                        <span className="platform-tag font-bold">{d.Platform}</span>
                       </td>
                       <td>
                         <span className="text-xs font-bold text-amber-600">
@@ -402,6 +469,158 @@ export function CsvDatabaseView({ showToast }) {
                       <td className="content-cell-preview" title={d.Content}>
                         {d.Content}
                       </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* 4. WORKSPACES DATASET */}
+          {activeDataset === 'workspaces' && (
+            <div className="table-wrapper">
+              <table className="posts-data-table">
+                <thead>
+                  <tr>
+                    <th>Workspace ID</th>
+                    <th>Workspace Name</th>
+                    <th>Slug</th>
+                    <th>Owner Role</th>
+                    <th>Active Plan</th>
+                    <th>Created At</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {workspacesList.map((w) => (
+                    <tr key={w.ID}>
+                      <td className="font-mono text-slate-muted">{w.ID}</td>
+                      <td className="font-bold">{w.Name}</td>
+                      <td className="font-mono text-xs text-primary">/{w.Slug}</td>
+                      <td><span className="role-badge">{w.Role}</span></td>
+                      <td><span className="platform-tag" style={{ backgroundColor: '#2563eb' }}>{w.Plan}</span></td>
+                      <td className="text-slate-muted font-mono">{w.CreatedAt}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* 5. SOCIAL ACCOUNTS DATASET */}
+          {activeDataset === 'accounts' && (
+            <div className="table-wrapper">
+              <table className="posts-data-table">
+                <thead>
+                  <tr>
+                    <th>Account ID</th>
+                    <th>Workspace ID</th>
+                    <th>Platform</th>
+                    <th>Username</th>
+                    <th>Followers</th>
+                    <th>Token Preview</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {accountsList.map((a) => (
+                    <tr key={a.ID}>
+                      <td className="font-mono text-slate-muted">{a.ID}</td>
+                      <td className="font-mono text-xs">{a.WorkspaceId}</td>
+                      <td><span className="platform-tag font-bold">{a.Platform}</span></td>
+                      <td className="font-bold">{a.Username}</td>
+                      <td className="font-mono">{parseInt(a.Followers || 0).toLocaleString()}</td>
+                      <td className="font-mono text-xs text-slate-500">{a.TokenPreview || '••••••••••••••••'}</td>
+                      <td><span className="status-pill published">{a.Status}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* 6. CAMPAIGNS DATASET */}
+          {activeDataset === 'campaigns' && (
+            <div className="table-wrapper">
+              <table className="posts-data-table">
+                <thead>
+                  <tr>
+                    <th>Campaign ID</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Date Window</th>
+                    <th>Platforms</th>
+                    <th>Tags</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {campaignsList.map((c) => (
+                    <tr key={c.ID}>
+                      <td className="font-mono text-slate-muted">{c.ID}</td>
+                      <td className="font-bold">{c.Name}</td>
+                      <td><span className="status-pill published">{c.Status}</span></td>
+                      <td className="text-xs text-slate-600">{c.StartDate} to {c.EndDate}</td>
+                      <td className="text-xs">{c.Platforms}</td>
+                      <td className="text-xs text-primary font-mono">{c.Tags}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* 7. MEDIA DATASET */}
+          {activeDataset === 'media' && (
+            <div className="table-wrapper">
+              <table className="posts-data-table">
+                <thead>
+                  <tr>
+                    <th>Media ID</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Size (MB)</th>
+                    <th>Used Count</th>
+                    <th>Created At</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {mediaList.map((m) => (
+                    <tr key={m.ID}>
+                      <td className="font-mono text-slate-muted">{m.ID}</td>
+                      <td className="font-bold">{m.Title}</td>
+                      <td><span className="role-badge">{m.Type}</span></td>
+                      <td className="font-mono">{m.SizeMB} MB</td>
+                      <td className="font-mono">{m.UsedCount}x</td>
+                      <td className="text-slate-muted font-mono">{m.CreatedAt}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* 8. AUDIT LOGS DATASET */}
+          {activeDataset === 'audit' && (
+            <div className="table-wrapper">
+              <table className="posts-data-table">
+                <thead>
+                  <tr>
+                    <th>Log ID</th>
+                    <th>Timestamp</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Resource</th>
+                    <th>Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {auditList.map((al) => (
+                    <tr key={al.ID}>
+                      <td className="font-mono text-slate-muted">{al.ID}</td>
+                      <td className="font-mono text-xs">{al.Timestamp}</td>
+                      <td className="text-primary font-medium">{al.UserEmail}</td>
+                      <td><span className="role-badge">{al.Action}</span></td>
+                      <td className="font-mono text-xs">{al.Resource}</td>
+                      <td className="text-xs text-slate-600">{al.Details}</td>
                     </tr>
                   ))}
                 </tbody>
