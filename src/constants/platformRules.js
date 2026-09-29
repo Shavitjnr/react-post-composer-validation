@@ -21,7 +21,7 @@ export const PLATFORM_RULES = {
   Facebook: {
     id: 'Facebook',
     name: 'Facebook',
-    characterLimit: 5000,
+    characterLimit: 63206,
     warningThreshold: 250,
     color: '#1877f2',
     badge: 'FB',
@@ -29,7 +29,7 @@ export const PLATFORM_RULES = {
     supportsMedia: true,
     supportsHashtags: true,
     mediaTypes: ['image', 'video', 'link'],
-    description: 'Page & Group Publications (Max 5,000 chars)',
+    description: 'Page & Group Publications (Max 63,206 chars)',
   },
   LinkedIn: {
     id: 'LinkedIn',

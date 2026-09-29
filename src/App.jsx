@@ -132,8 +132,14 @@ function App({ hasClerkConfigured = false }) {
 
   const handleAuthSuccess = (user) => {
     setCurrentUser(user);
-    navigate('panel'); // Shift to /Pannel after login
-    showToast(`Logged in as ${user.name}. Welcome to Post Composer Pro!`, 'success');
+    const isSuper = adminService.isSuperAdmin(user);
+    if (isSuper) {
+      navigate('admin');
+      showToast(`Super Admin authenticated: Welcome ${user.name}`, 'success');
+    } else {
+      navigate('panel');
+      showToast(`Logged in as ${user.name}. Welcome to Personal Brand!`, 'success');
+    }
   };
 
   // Only Get Started Free prompts login and moves to /Pannel
@@ -182,6 +188,7 @@ function App({ hasClerkConfigured = false }) {
           <SuperAdminDashboard
             onNavigateToPanel={() => navigate('panel')}
             onNavigateToHome={() => navigate('home')}
+            onLogout={handleLogout}
             onImpersonateSuccess={(user) => {
               setCurrentUser(user);
             }}
