@@ -13,15 +13,18 @@ import { AnalyticsView } from './components/AnalyticsView';
 import { TeamManager } from './components/TeamManager';
 import { BillingView } from './components/BillingView';
 import { AuditLogView } from './components/AuditLogView';
-import { CsvDatabaseView } from './components/CsvDatabaseView';
+import { WorkspaceSettingsView } from './components/WorkspaceSettingsView';
+import { AdminAccessDenied } from './components/AdminAccessDenied';
 import { WorkspaceModal } from './components/WorkspaceModal';
 import { UpgradeModal } from './components/UpgradeModal';
 import { AuthModal } from './components/AuthModal';
 import { LandingPage } from './components/LandingPage';
 import { SuperAdminDashboard } from './components/SuperAdminDashboard';
+import { ClerkUserBridge } from './components/ClerkAuthControls';
 
 import { workspaceService } from './services/workspaceService';
 import { subscriptionService } from './services/subscriptionService';
+import { adminService } from './services/adminService';
 import { csvStorage } from './utils/csvStorage';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
@@ -77,6 +80,19 @@ function App({ hasClerkConfigured = false }) {
     }
   }, [toast]);
 
+  const [clerkState, setClerkState] = useState({
+    isSignedIn: false,
+    user: null,
+    signOut: null
+  });
+
+  // Calculate active effective user and super admin authorization
+  const effectiveUser = clerkState.isSignedIn && clerkState.user ? clerkState.user : currentUser;
+  const isUserSuperAdmin = adminService.isSuperAdmin(
+    effectiveUser,
+    effectiveUser?.orgId || clerkState.user?.orgId
+  );
+
   const handleSelectWorkspace = (workspaceId) => {
     workspaceService.setActiveWorkspaceId(workspaceId);
     setActiveWorkspace(workspaceService.getActiveWorkspace());
@@ -89,9 +105,17 @@ function App({ hasClerkConfigured = false }) {
   };
 
   const handleLogout = () => {
+    if (clerkState.signOut) {
+      try {
+        clerkState.signOut();
+      } catch (err) {
+        console.error('Clerk signOut error', err);
+      }
+    }
     csvStorage.logoutUser();
     setCurrentUser(null);
     showToast('Logged out of session', 'info');
+    navigate('home');
   };
 
   const handleAuthSuccess = (user) => {
@@ -102,23 +126,38 @@ function App({ hasClerkConfigured = false }) {
 
   return (
     <>
+      {/* Clerk User & Org Bridge */}
+      <ClerkUserBridge
+        hasClerkConfigured={hasClerkConfigured}
+        onSyncClerkState={setClerkState}
+      />
+
       {currentRoute === 'home' && (
         <LandingPage
           onNavigateToPanel={() => navigate('panel')}
-          onNavigateToAdmin={() => navigate('admin')}
           onOpenAuth={() => setIsAuthOpen(true)}
         />
       )}
 
+      {/* Admin Route: STRICTLY guarded for Super Admin; others receive 403 Forbidden */}
       {currentRoute === 'admin' && (
-        <SuperAdminDashboard
-          onNavigateToPanel={() => navigate('panel')}
-          onNavigateToHome={() => navigate('home')}
-          onImpersonateSuccess={(user) => {
-            setCurrentUser(user);
-          }}
-          showToast={showToast}
-        />
+        isUserSuperAdmin ? (
+          <SuperAdminDashboard
+            onNavigateToPanel={() => navigate('panel')}
+            onNavigateToHome={() => navigate('home')}
+            onImpersonateSuccess={(user) => {
+              setCurrentUser(user);
+            }}
+            showToast={showToast}
+          />
+        ) : (
+          <AdminAccessDenied
+            currentUser={effectiveUser}
+            onNavigateToPanel={() => navigate('panel')}
+            onNavigateToHome={() => navigate('home')}
+            onOpenAuth={() => setIsAuthOpen(true)}
+          />
+        )
       )}
 
       {currentRoute === 'panel' && (
@@ -130,7 +169,7 @@ function App({ hasClerkConfigured = false }) {
             activeWorkspace={activeWorkspace}
             workspaces={workspaces}
             onOpenWorkspaceModal={() => setIsWorkspaceModalOpen(true)}
-            currentUser={currentUser}
+            currentUser={effectiveUser}
             onLogout={handleLogout}
             onOpenUpgradeModal={() => setIsUpgradeModalOpen(true)}
           />
@@ -147,6 +186,9 @@ function App({ hasClerkConfigured = false }) {
               hasClerkConfigured={hasClerkConfigured}
               onNavigateToHome={() => navigate('home')}
               onNavigateToAdmin={() => navigate('admin')}
+              isSuperAdmin={isUserSuperAdmin}
+              currentUser={effectiveUser}
+              onLogout={handleLogout}
             />
 
             {/* Dynamic Main Workspace Content */}
@@ -238,8 +280,9 @@ function App({ hasClerkConfigured = false }) {
                 />
               )}
 
-              {activeTab === 'csv' && (
-                <CsvDatabaseView
+              {(activeTab === 'settings' || activeTab === 'csv') && (
+                <WorkspaceSettingsView
+                  activeWorkspace={activeWorkspace}
                   showToast={showToast}
                 />
               )}

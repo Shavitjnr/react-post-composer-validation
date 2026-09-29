@@ -11,7 +11,8 @@ import {
   Flag,
   UploadCloud,
   Building2,
-  ChevronDown
+  ChevronDown,
+  LogOut
 } from 'lucide-react';
 import { notificationService } from '../services/notificationService';
 import { ClerkNavControls } from './ClerkAuthControls';
@@ -25,7 +26,10 @@ export function TopNavbar({
   showToast,
   hasClerkConfigured,
   onNavigateToHome,
-  onNavigateToAdmin
+  onNavigateToAdmin,
+  isSuperAdmin = false,
+  currentUser,
+  onLogout
 }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showCreateMenu, setShowCreateMenu] = useState(false);
@@ -188,18 +192,34 @@ export function TopNavbar({
           <span>Home</span>
         </button>
 
-        <button
-          type="button"
-          onClick={onNavigateToAdmin}
-          className="top-admin-pill"
-          title="Super Admin Dashboard for Shavit Daloutra"
-        >
-          <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
-          <span>Super Admin</span>
-        </button>
+        {/* Super Admin Access Pill - STRICTLY guarded for Super Admin only */}
+        {isSuperAdmin && (
+          <button
+            type="button"
+            onClick={onNavigateToAdmin}
+            className="top-admin-pill"
+            title="Super Admin Dashboard (Master Authority)"
+          >
+            <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
+            <span>Super Admin</span>
+          </button>
+        )}
 
         {/* Clerk Authentication Controls */}
         <ClerkNavControls hasClerkConfigured={hasClerkConfigured} />
+
+        {/* Dedicated Sign Out / Log Out Button */}
+        {onLogout && (
+          <button
+            type="button"
+            onClick={onLogout}
+            className="top-logout-btn"
+            title="Sign out of active session"
+          >
+            <LogOut className="w-3.5 h-3.5 text-rose-500" />
+            <span>Sign Out</span>
+          </button>
+        )}
 
         {/* Workspace Switcher Pill */}
         <button

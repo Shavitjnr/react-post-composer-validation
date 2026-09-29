@@ -54,16 +54,6 @@ export function LandingPage({ onNavigateToPanel, onNavigateToAdmin, onOpenAuth }
           <div className="landing-nav-actions">
             <button
               type="button"
-              onClick={onNavigateToAdmin}
-              className="btn-landing-admin"
-              title="Super Admin Dashboard for Shavit Daloutra"
-            >
-              <ShieldCheck className="w-4 h-4 text-amber-600" />
-              <span>Super Admin</span>
-            </button>
-
-            <button
-              type="button"
               onClick={onOpenAuth}
               className="btn-landing-login"
             >
@@ -111,14 +101,13 @@ export function LandingPage({ onNavigateToPanel, onNavigateToAdmin, onOpenAuth }
               <ArrowRight className="w-4 h-4" />
             </button>
 
-            <button
-              type="button"
-              onClick={onNavigateToAdmin}
+            <a
+              href="#demo"
               className="btn-hero-secondary"
             >
-              <ShieldCheck className="w-5 h-5 text-amber-600" />
-              <span>Super Admin Dashboard (/admin)</span>
-            </button>
+              <span>Try Live Composer</span>
+              <ChevronRight className="w-4 h-4" />
+            </a>
           </div>
 
           <div className="hero-guarantees-row">
@@ -444,34 +433,7 @@ export function LandingPage({ onNavigateToPanel, onNavigateToAdmin, onOpenAuth }
         </div>
       </section>
 
-      {/* 7. Super Admin Quick Access Callout */}
-      <section className="landing-superadmin-banner">
-        <div className="superadmin-banner-inner">
-          <div className="banner-left">
-            <div className="superadmin-badge-row">
-              <ShieldCheck className="w-5 h-5 text-amber-500" />
-              <span>SUPER ADMIN COMMAND CENTER</span>
-            </div>
-            <h3>Master Administrative Access for Shavit Daloutra</h3>
-            <p>
-              Inspect all registered accounts, verify credentials, monitor live audit trails,
-              and govern workspace activities directly from the dedicated `/admin` control room.
-            </p>
-          </div>
-          <div className="banner-right">
-            <button
-              type="button"
-              onClick={onNavigateToAdmin}
-              className="btn-superadmin-enter"
-            >
-              <span>Enter Super Admin Portal</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* 8. Footer */}
+      {/* 7. Footer */}
       <footer className="landing-footer">
         <div className="landing-footer-inner">
           <div className="footer-col-main">
@@ -485,7 +447,7 @@ export function LandingPage({ onNavigateToPanel, onNavigateToAdmin, onOpenAuth }
               One workspace. Every social channel. Complete content control.
             </p>
             <span className="copyright-caption">
-              © {new Date().getFullYear()} Post Composer Pro SaaS. Super Admin: Shavit Daloutra.
+              © {new Date().getFullYear()} Post Composer Pro SaaS. Enterprise Social Media Suite.
             </span>
           </div>
 
@@ -493,9 +455,6 @@ export function LandingPage({ onNavigateToPanel, onNavigateToAdmin, onOpenAuth }
             <span className="footer-links-title">Quick Portals</span>
             <button type="button" onClick={onNavigateToPanel} className="footer-link-btn">
               App Workspace Panel (/Pannel)
-            </button>
-            <button type="button" onClick={onNavigateToAdmin} className="footer-link-btn">
-              Super Admin Dashboard (/admin)
             </button>
             <button type="button" onClick={onOpenAuth} className="footer-link-btn">
               Account Login / Register

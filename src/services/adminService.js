@@ -5,10 +5,19 @@ import { workspaceService } from './workspaceService';
 const ADMIN_USERS_EXTRA_KEY = 'pcp_admin_users_meta_db';
 
 const DEFAULT_USERS_META = {
+  'daloutrashavit@gmail.com': {
+    verified: true,
+    status: 'Active',
+    username: 'daloutrashavit',
+    connectedAccounts: ['Twitter', 'LinkedIn', 'Instagram', 'Facebook', 'YouTube'],
+    lastLogin: 'Just now',
+    ipAddress: '192.168.1.100',
+    device: 'Desktop (Windows / Chrome)'
+  },
   'shavitdaloutra28@gmail.com': {
     verified: true,
     status: 'Active',
-    username: 'shavitdaloutra',
+    username: 'daloutrashavit',
     connectedAccounts: ['Twitter', 'LinkedIn', 'Instagram', 'Facebook', 'YouTube'],
     lastLogin: 'Just now',
     ipAddress: '192.168.1.100',
@@ -35,10 +44,52 @@ const DEFAULT_USERS_META = {
 };
 
 export const adminService = {
-  // Super Admin identification
-  SUPER_ADMIN_EMAIL: 'shavitdaloutra28@gmail.com',
+  // Master Super Admin identification
+  SUPER_ADMIN_EMAIL: 'daloutrashavit@gmail.com',
+  SUPER_ADMIN_EMAILS: ['daloutrashavit@gmail.com', 'shavitdaloutra28@gmail.com'],
+  SUPER_ADMIN_USERNAMES: ['daloutrashavit', 'shavitdaloutra'],
+  SUPER_ADMIN_ORG_ID: 'org_3JzmVi9pR3cE8KEwBWeAAqBmTAK',
   SUPER_ADMIN_NAME: 'Shavit Daloutra',
-  SUPER_ADMIN_USER: 'shavitdaloutra',
+
+  // Authorization check for Super Admin access
+  isSuperAdmin: (user, orgId = null) => {
+    if (!user) return false;
+    if (orgId && orgId === adminService.SUPER_ADMIN_ORG_ID) return true;
+    if (user.orgId && user.orgId === adminService.SUPER_ADMIN_ORG_ID) return true;
+    if (user.organizationId && user.organizationId === adminService.SUPER_ADMIN_ORG_ID) return true;
+    if (user.role === 'Super Admin' || user.Role === 'Super Admin') return true;
+
+    // Check Clerk organization memberships if present
+    if (Array.isArray(user.organizationMemberships)) {
+      const hasSuperOrg = user.organizationMemberships.some(
+        (m) => m?.organization?.id === adminService.SUPER_ADMIN_ORG_ID
+      );
+      if (hasSuperOrg) return true;
+    }
+
+    // Extract all possible email addresses (Clerk or standard)
+    const userEmails = [];
+    if (user.email) userEmails.push(user.email.toLowerCase());
+    if (user.Email) userEmails.push(user.Email.toLowerCase());
+    if (user.primaryEmailAddress?.emailAddress) {
+      userEmails.push(user.primaryEmailAddress.emailAddress.toLowerCase());
+    }
+    if (Array.isArray(user.emailAddresses)) {
+      user.emailAddresses.forEach((ea) => {
+        if (ea?.emailAddress) userEmails.push(ea.emailAddress.toLowerCase());
+      });
+    }
+
+    const username = (user.username || user.Username || '').toLowerCase();
+
+    const isAuthorizedEmail = userEmails.some((e) =>
+      adminService.SUPER_ADMIN_EMAILS.some((adminE) => adminE.toLowerCase() === e)
+    );
+    if (isAuthorizedEmail) return true;
+
+    if (adminService.SUPER_ADMIN_USERNAMES.some((u) => u.toLowerCase() === username)) return true;
+    return false;
+  },
 
   getUsersMeta: () => {
     try {
@@ -74,7 +125,7 @@ export const adminService = {
       const userPosts = allPosts.filter((p) => p.UserEmail?.toLowerCase() === u.Email?.toLowerCase());
       const userDrafts = allDrafts.filter((d) => d.UserEmail?.toLowerCase() === u.Email?.toLowerCase());
 
-      const isSuperAdmin = u.Email.toLowerCase() === adminService.SUPER_ADMIN_EMAIL.toLowerCase() || u.Role === 'Super Admin';
+      const isSuperAdmin = adminService.isSuperAdmin({ email: u.Email, role: u.Role });
 
       return {
         id: u.ID,
@@ -99,7 +150,7 @@ export const adminService = {
 
   // Toggle user verification
   toggleUserVerification: (userEmail) => {
-    if (userEmail.toLowerCase() === adminService.SUPER_ADMIN_EMAIL.toLowerCase()) {
+    if (adminService.isSuperAdmin({ email: userEmail })) {
       return { success: false, error: 'Super Admin is permanently verified.' };
     }
 
@@ -111,7 +162,7 @@ export const adminService = {
 
     csvRepository.logAction(
       workspaceService.getActiveWorkspaceId(),
-      adminService.SUPER_ADMIN_EMAIL,
+      'daloutrashavit@gmail.com',
       'ADMIN_TOGGLE_VERIFY',
       userEmail,
       `Super Admin changed verification for ${userEmail} to ${current.verified ? 'VERIFIED' : 'UNVERIFIED'}`
@@ -122,7 +173,7 @@ export const adminService = {
 
   // Toggle user account suspension
   toggleUserStatus: (userEmail) => {
-    if (userEmail.toLowerCase() === adminService.SUPER_ADMIN_EMAIL.toLowerCase()) {
+    if (adminService.isSuperAdmin({ email: userEmail })) {
       return { success: false, error: 'Cannot suspend the Super Admin account.' };
     }
 
@@ -134,7 +185,7 @@ export const adminService = {
 
     csvRepository.logAction(
       workspaceService.getActiveWorkspaceId(),
-      adminService.SUPER_ADMIN_EMAIL,
+      'daloutrashavit@gmail.com',
       'ADMIN_TOGGLE_SUSPEND',
       userEmail,
       `Super Admin changed account status for ${userEmail} to ${current.status}`
@@ -149,7 +200,7 @@ export const adminService = {
     const target = users.find((u) => u.Email.toLowerCase() === userEmail.toLowerCase());
     if (!target) return { success: false, error: 'User not found.' };
 
-    if (userEmail.toLowerCase() === adminService.SUPER_ADMIN_EMAIL.toLowerCase() && newRole !== 'Super Admin') {
+    if (adminService.isSuperAdmin({ email: userEmail }) && newRole !== 'Super Admin') {
       return { success: false, error: 'Cannot downgrade the Super Admin role.' };
     }
 
@@ -158,7 +209,7 @@ export const adminService = {
 
     csvRepository.logAction(
       workspaceService.getActiveWorkspaceId(),
-      adminService.SUPER_ADMIN_EMAIL,
+      'daloutrashavit@gmail.com',
       'ADMIN_UPDATE_ROLE',
       userEmail,
       `Super Admin promoted/changed ${userEmail} role to ${newRole}`
@@ -183,7 +234,7 @@ export const adminService = {
 
     csvRepository.logAction(
       workspaceService.getActiveWorkspaceId(),
-      adminService.SUPER_ADMIN_EMAIL,
+      'daloutrashavit@gmail.com',
       'ADMIN_IMPERSONATE',
       userEmail,
       `Super Admin logged into workspace as ${target.Name} (${userEmail})`
@@ -197,8 +248,9 @@ export const adminService = {
     const adminUser = {
       id: 'usr_1',
       name: adminService.SUPER_ADMIN_NAME,
-      email: adminService.SUPER_ADMIN_EMAIL,
-      role: 'Super Admin'
+      email: 'daloutrashavit@gmail.com',
+      role: 'Super Admin',
+      orgId: adminService.SUPER_ADMIN_ORG_ID
     };
     csvStorage.setActiveUser(adminUser);
     return adminUser;

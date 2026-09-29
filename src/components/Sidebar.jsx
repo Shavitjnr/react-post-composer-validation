@@ -18,7 +18,8 @@ import {
   Plus,
   ArrowUpRight,
   LogOut,
-  Building2
+  Building2,
+  Settings
 } from 'lucide-react';
 import { subscriptionService } from '../services/subscriptionService';
 import { workspaceService } from '../services/workspaceService';
@@ -195,11 +196,11 @@ export function Sidebar({
 
           <button
             type="button"
-            onClick={() => setActiveTab('csv')}
-            className={`nav-menu-item ${activeTab === 'csv' ? 'active' : ''}`}
+            onClick={() => setActiveTab('settings')}
+            className={`nav-menu-item ${activeTab === 'settings' ? 'active' : ''}`}
           >
-            <Database className="w-4 h-4" />
-            <span>CSV Inspector</span>
+            <Settings className="w-4 h-4" />
+            <span>Workspace Settings</span>
           </button>
         </div>
       </nav>
