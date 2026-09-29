@@ -200,6 +200,12 @@ function App({ hasClerkConfigured = false }) {
             onNavigateToPanel={() => navigate('panel')}
             onNavigateToHome={() => navigate('home')}
             onOpenAuth={() => setIsAuthOpen(true)}
+            onAuthenticateAsSuperAdmin={() => {
+              const adminUser = adminService.restoreSuperAdminSession();
+              setCurrentUser(adminUser);
+              showToast('Super Admin authenticated: Welcome Shavit Daloutra', 'success');
+              navigate('admin');
+            }}
           />
         )
       )}

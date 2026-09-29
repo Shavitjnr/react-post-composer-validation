@@ -353,22 +353,22 @@ export function SuperAdminDashboard({
   // Global Search Filtered Results
   const globalSearchResults = {
     users: usersList.filter((u) =>
-      u.name.toLowerCase().includes(globalSearchQuery.toLowerCase()) ||
-      u.email.toLowerCase().includes(globalSearchQuery.toLowerCase())
+      (u.name || '').toLowerCase().includes(globalSearchQuery.toLowerCase()) ||
+      (u.email || '').toLowerCase().includes(globalSearchQuery.toLowerCase())
     ),
     workspaces: workspacesList.filter((w) =>
-      w.Name.toLowerCase().includes(globalSearchQuery.toLowerCase())
+      (w.Name || w.name || '').toLowerCase().includes(globalSearchQuery.toLowerCase())
     ),
     posts: postsList.filter((p) =>
       (p.content || '').toLowerCase().includes(globalSearchQuery.toLowerCase()) ||
       (p.userEmail || '').toLowerCase().includes(globalSearchQuery.toLowerCase())
     ),
     campaigns: campaignsList.filter((c) =>
-      (c.Name || '').toLowerCase().includes(globalSearchQuery.toLowerCase())
+      (c.Name || c.name || '').toLowerCase().includes(globalSearchQuery.toLowerCase())
     ),
     transactions: transactionsList.filter((t) =>
-      t.id.toLowerCase().includes(globalSearchQuery.toLowerCase()) ||
-      t.userEmail.toLowerCase().includes(globalSearchQuery.toLowerCase())
+      (t.id || '').toLowerCase().includes(globalSearchQuery.toLowerCase()) ||
+      (t.userEmail || '').toLowerCase().includes(globalSearchQuery.toLowerCase())
     )
   };
 

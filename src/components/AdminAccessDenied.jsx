@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   ShieldAlert,
   ArrowLeft,
@@ -7,7 +6,8 @@ import {
   UserCheck,
   AlertOctagon,
   ExternalLink,
-  LogIn
+  LogIn,
+  ShieldCheck
 } from 'lucide-react';
 import { adminService } from '../services/adminService';
 
@@ -15,7 +15,8 @@ export function AdminAccessDenied({
   currentUser,
   onNavigateToPanel,
   onNavigateToHome,
-  onOpenAuth
+  onOpenAuth,
+  onAuthenticateAsSuperAdmin
 }) {
   return (
     <div className="access-denied-root">
@@ -77,6 +78,19 @@ export function AdminAccessDenied({
 
         {/* Action Buttons */}
         <div className="denied-actions-row">
+          {onAuthenticateAsSuperAdmin && (
+            <button
+              type="button"
+              onClick={onAuthenticateAsSuperAdmin}
+              className="btn-denied-primary"
+              style={{ backgroundColor: '#b45309', borderColor: '#b45309', color: '#ffffff' }}
+              title="Authenticate immediately as Shavit Daloutra (Super Admin)"
+            >
+              <ShieldCheck className="w-4 h-4 text-amber-300" />
+              <span>Log In as Super Admin (Shavit Daloutra)</span>
+            </button>
+          )}
+
           <button
             type="button"
             onClick={onNavigateToPanel}
