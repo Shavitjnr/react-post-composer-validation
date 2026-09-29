@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { notificationService } from '../services/notificationService';
 import { ClerkNavControls } from './ClerkAuthControls';
+import { Home, ShieldCheck } from 'lucide-react';
 
 export function TopNavbar({
   activeWorkspace,
@@ -22,7 +23,9 @@ export function TopNavbar({
   onNavigate,
   onOpenMediaUpload,
   showToast,
-  hasClerkConfigured
+  hasClerkConfigured,
+  onNavigateToHome,
+  onNavigateToAdmin
 }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showCreateMenu, setShowCreateMenu] = useState(false);
@@ -173,6 +176,27 @@ export function TopNavbar({
             </div>
           )}
         </div>
+
+        {/* Route Quick Switchers */}
+        <button
+          type="button"
+          onClick={onNavigateToHome}
+          className="top-home-pill"
+          title="Return to Public Homepage"
+        >
+          <Home className="w-3.5 h-3.5" />
+          <span>Home</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={onNavigateToAdmin}
+          className="top-admin-pill"
+          title="Super Admin Dashboard for Shavit Daloutra"
+        >
+          <ShieldCheck className="w-3.5 h-3.5 text-amber-500" />
+          <span>Super Admin</span>
+        </button>
 
         {/* Clerk Authentication Controls */}
         <ClerkNavControls hasClerkConfigured={hasClerkConfigured} />

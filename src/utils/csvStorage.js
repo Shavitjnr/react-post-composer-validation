@@ -6,19 +6,19 @@
 
 // Initial default CSV datasets (Clean, professional, without emojis)
 export const DEFAULT_USERS_CSV = `ID,Name,Email,Password,Role,CreatedAt
-usr_1,"Alex Morgan","alex@example.com","password123","Administrator","2026-09-29 09:00:00"
+usr_1,"Shavit Daloutra","shavitdaloutra28@gmail.com","shavitdaloutra","Super Admin","2026-09-29 09:00:00"
 usr_2,"Sarah Connor","sarah@tech.org","sarahSecure#2026","Editor","2026-09-29 09:15:00"
 usr_3,"David Chen","david@startup.io","davidPass!789","Contributor","2026-09-29 09:30:00"`;
 
 export const DEFAULT_POSTS_CSV = `ID,UserEmail,Platform,Status,CharCount,Limit,ScheduledAt,PublishedAt,Content
-post_1,"alex@example.com","Twitter","Published",118,280,"","2026-09-29 09:30:00","Announcing our corporate platform release today. Enterprise-grade character validation is now live across all channels."
-post_2,"alex@example.com","LinkedIn","Published",254,3000,"","2026-09-29 09:45:00","Clean architectural discipline and controlled state management in React provide stability for mission-critical software systems. Centralized validation rules remain essential for institutional web engineering."
-post_3,"alex@example.com","Twitter","Scheduled",108,280,"2026-10-01 10:00:00","","Upcoming Technical Seminar: Database Normalization and CSV Pipeline Design with React. Registration is open."
+post_1,"shavitdaloutra28@gmail.com","Twitter","Published",118,280,"","2026-09-29 09:30:00","Announcing our corporate platform release today. Enterprise-grade character validation is now live across all channels."
+post_2,"shavitdaloutra28@gmail.com","LinkedIn","Published",254,3000,"","2026-09-29 09:45:00","Clean architectural discipline and controlled state management in React provide stability for mission-critical software systems. Centralized validation rules remain essential for institutional web engineering."
+post_3,"shavitdaloutra28@gmail.com","Twitter","Scheduled",108,280,"2026-10-01 10:00:00","","Upcoming Technical Seminar: Database Normalization and CSV Pipeline Design with React. Registration is open."
 post_4,"sarah@tech.org","LinkedIn","Scheduled",178,3000,"2026-10-02 14:30:00","","Our engineering organization is currently hiring Senior Frontend Architects experienced in controlled components and state governance. Please review our open listings."`;
 
 export const DEFAULT_DRAFTS_CSV = `ID,UserEmail,Platform,IsFavorite,CreatedAt,Content
-draft_1,"alex@example.com","Twitter","true","2026-09-29 08:30:00","Preliminary review notes regarding custom hooks and state encapsulation across enterprise React applications."
-draft_2,"alex@example.com","LinkedIn","false","2026-09-29 08:45:00","Five key principles observed during high-reliability software deployments. Full technical analysis will follow next Tuesday."
+draft_1,"shavitdaloutra28@gmail.com","Twitter","true","2026-09-29 08:30:00","Preliminary review notes regarding custom hooks and state encapsulation across enterprise React applications."
+draft_2,"shavitdaloutra28@gmail.com","LinkedIn","false","2026-09-29 08:45:00","Five key principles observed during high-reliability software deployments. Full technical analysis will follow next Tuesday."
 draft_3,"sarah@tech.org","Twitter","true","2026-09-29 09:10:00","Summary of performance profiling benchmarks for production web services in 2026."`;
 
 /**
@@ -211,9 +211,9 @@ export const csvStorage = {
     }
     return {
       id: 'usr_1',
-      name: 'Alex Morgan',
-      email: 'alex@example.com',
-      role: 'Administrator',
+      name: 'Shavit Daloutra',
+      email: 'shavitdaloutra28@gmail.com',
+      role: 'Super Admin',
     };
   },
 
@@ -240,7 +240,7 @@ export const csvStorage = {
     const posts = csvStorage.getPosts();
     const newPost = {
       ID: `post_${Date.now()}`,
-      UserEmail: postData.userEmail || 'alex@example.com',
+      UserEmail: postData.userEmail || 'shavitdaloutra28@gmail.com',
       Platform: postData.platform,
       Status: postData.status || 'Published',
       CharCount: postData.charCount || postData.content.length,
@@ -317,7 +317,7 @@ export const csvStorage = {
     const drafts = csvStorage.getDrafts();
     const newDraft = {
       ID: `draft_${Date.now()}`,
-      UserEmail: draftData.userEmail || 'alex@example.com',
+      UserEmail: draftData.userEmail || 'shavitdaloutra28@gmail.com',
       Platform: draftData.platform,
       IsFavorite: draftData.isFavorite ? 'true' : 'false',
       CreatedAt: new Date().toISOString().replace('T', ' ').slice(0, 19),

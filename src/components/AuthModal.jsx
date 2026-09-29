@@ -5,8 +5,8 @@ import { csvStorage } from '../utils/csvStorage';
 export function AuthModal({ isOpen, onClose, onAuthSuccess, showToast }) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('alex@example.com');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('shavitdaloutra28@gmail.com');
+  const [password, setPassword] = useState('shavitdaloutra');
   const [error, setError] = useState('');
 
   if (!isOpen) return null;
@@ -75,10 +75,10 @@ export function AuthModal({ isOpen, onClose, onAuthSuccess, showToast }) {
           <div className="demo-pills">
             <button
               type="button"
-              onClick={() => handleFillDemo('alex@example.com', 'password123')}
+              onClick={() => handleFillDemo('shavitdaloutra28@gmail.com', 'shavitdaloutra')}
               className="demo-pill"
             >
-              alex@example.com
+              shavitdaloutra28@gmail.com (Super Admin)
             </button>
             <button
               type="button"

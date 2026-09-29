@@ -55,7 +55,7 @@ export const campaignService = {
       Tags: Array.isArray(tags) ? tags.join(',') : tags,
     };
     csvRepository.saveCampaign(newCamp);
-    csvRepository.logAction(wsId, 'alex@example.com', 'CREATE_CAMPAIGN', newCamp.ID, `Created campaign: ${newCamp.Name}`);
+    csvRepository.logAction(wsId, 'shavitdaloutra28@gmail.com', 'CREATE_CAMPAIGN', newCamp.ID, `Created campaign: ${newCamp.Name}`);
     return { success: true, campaign: newCamp };
   },
 

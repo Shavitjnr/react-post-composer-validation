@@ -43,7 +43,7 @@ export const postService = {
     const newPost = {
       ID: `post_${Date.now()}`,
       WorkspaceId: wsId,
-      UserEmail: authorEmail || 'alex@example.com',
+      UserEmail: authorEmail || 'shavitdaloutra28@gmail.com',
       Platform: platform,
       Content: content.trim(),
       Status: 'Published',
@@ -80,7 +80,7 @@ export const postService = {
     const newPost = {
       ID: `post_${Date.now()}`,
       WorkspaceId: wsId,
-      UserEmail: authorEmail || 'alex@example.com',
+      UserEmail: authorEmail || 'shavitdaloutra28@gmail.com',
       Platform: platform,
       Content: content.trim(),
       Status: 'Pending Review',
@@ -112,7 +112,7 @@ export const postService = {
     target.Status = target.ScheduledAt ? 'Scheduled' : 'Approved';
     csvStorage.saveAllPosts(posts);
 
-    csvRepository.logAction(wsId, reviewerEmail || 'alex@example.com', 'APPROVE_POST', postId, `Approved post for ${target.Platform}`);
+    csvRepository.logAction(wsId, reviewerEmail || 'shavitdaloutra28@gmail.com', 'APPROVE_POST', postId, `Approved post for ${target.Platform}`);
     notificationService.notify(
       wsId,
       'Post Approved',
@@ -134,7 +134,7 @@ export const postService = {
     target.Content = `[Changes Requested: ${feedback}]\n\n${target.Content}`;
     csvStorage.saveAllPosts(posts);
 
-    csvRepository.logAction(wsId, reviewerEmail || 'alex@example.com', 'REQUEST_CHANGES', postId, feedback);
+    csvRepository.logAction(wsId, reviewerEmail || 'shavitdaloutra28@gmail.com', 'REQUEST_CHANGES', postId, feedback);
     notificationService.notify(
       wsId,
       'Changes Requested',
@@ -172,7 +172,7 @@ export const postService = {
     const newPost = {
       ID: `post_${Date.now()}`,
       WorkspaceId: wsId,
-      UserEmail: authorEmail || 'alex@example.com',
+      UserEmail: authorEmail || 'shavitdaloutra28@gmail.com',
       Platform: platform,
       Content: content.trim(),
       Status: 'Scheduled',
@@ -200,7 +200,7 @@ export const postService = {
     const newDraft = {
       ID: `draft_${Date.now()}`,
       WorkspaceId: wsId,
-      UserEmail: userEmail || 'alex@example.com',
+      UserEmail: userEmail || 'shavitdaloutra28@gmail.com',
       Platform: platform,
       Content: content.trim(),
       IsFavorite: 'false',
@@ -217,7 +217,7 @@ export const postService = {
     const dup = {
       ID: `draft_${Date.now()}`,
       WorkspaceId: wsId,
-      UserEmail: draft.UserEmail || 'alex@example.com',
+      UserEmail: draft.UserEmail || 'shavitdaloutra28@gmail.com',
       Platform: draft.Platform,
       Content: `Copy of ${draft.Content}`,
       IsFavorite: 'false',
@@ -246,6 +246,6 @@ export const postService = {
   deletePost: (postId) => {
     const wsId = workspaceService.getActiveWorkspaceId();
     csvStorage.deletePost(postId);
-    csvRepository.logAction(wsId, 'alex@example.com', 'DELETE_POST', postId, 'Cancelled / removed post');
+    csvRepository.logAction(wsId, 'shavitdaloutra28@gmail.com', 'DELETE_POST', postId, 'Cancelled / removed post');
   },
 };

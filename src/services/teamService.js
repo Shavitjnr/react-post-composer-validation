@@ -13,12 +13,12 @@ const DEFAULT_TEAM = [
   {
     id: 'mem_1',
     workspaceId: 'ws_1',
-    name: 'Alex Morgan',
-    email: 'alex@example.com',
-    role: 'Owner',
+    name: 'Shavit Daloutra',
+    email: 'shavitdaloutra28@gmail.com',
+    role: 'Super Admin',
     status: 'Active',
     lastActive: 'Just now',
-    avatar: 'AM',
+    avatar: 'SD',
   },
   {
     id: 'mem_2',
@@ -104,7 +104,7 @@ export const teamService = {
 
     all.push(newMember);
     localStorage.setItem(TEAM_MEMBERS_KEY, JSON.stringify(all));
-    csvRepository.logAction(wsId, 'alex@example.com', 'INVITE_MEMBER', newMember.id, `Invited ${newMember.name} as ${newMember.role}`);
+    csvRepository.logAction(wsId, 'shavitdaloutra28@gmail.com', 'INVITE_MEMBER', newMember.id, `Invited ${newMember.name} as ${newMember.role}`);
     notificationService.notify(
       wsId,
       'New Team Member',
@@ -122,7 +122,7 @@ export const teamService = {
     if (target) {
       target.role = newRole;
       localStorage.setItem(TEAM_MEMBERS_KEY, JSON.stringify(all));
-      csvRepository.logAction(wsId, 'alex@example.com', 'UPDATE_ROLE', memberId, `Changed role to ${newRole}`);
+      csvRepository.logAction(wsId, 'shavitdaloutra28@gmail.com', 'UPDATE_ROLE', memberId, `Changed role to ${newRole}`);
       return { success: true };
     }
     return { success: false, error: 'Member not found' };
@@ -137,7 +137,7 @@ export const teamService = {
     }
     all = all.filter((m) => m.id !== memberId);
     localStorage.setItem(TEAM_MEMBERS_KEY, JSON.stringify(all));
-    csvRepository.logAction(wsId, 'alex@example.com', 'REMOVE_MEMBER', memberId, 'Removed member from workspace');
+    csvRepository.logAction(wsId, 'shavitdaloutra28@gmail.com', 'REMOVE_MEMBER', memberId, 'Removed member from workspace');
     return { success: true };
   },
 

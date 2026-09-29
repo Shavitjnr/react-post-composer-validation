@@ -96,7 +96,7 @@ export function PostComposer({
     const res = postService.publishPost({
       content,
       platform,
-      authorEmail: currentUser?.email || 'alex@example.com',
+      authorEmail: currentUser?.email || 'shavitdaloutra28@gmail.com',
       mediaUrl: attachedMedia?.Url || '',
       tags: assignedTags.join(','),
     });
@@ -114,7 +114,7 @@ export function PostComposer({
     postService.saveDraft({
       content,
       platform,
-      userEmail: currentUser?.email || 'alex@example.com',
+      userEmail: currentUser?.email || 'shavitdaloutra28@gmail.com',
     });
 
     showToast(`Draft saved for ${platform} in ${activeWorkspace?.Name || 'workspace'}.`, 'success');
@@ -130,7 +130,7 @@ export function PostComposer({
     postService.submitForReview({
       content,
       platform,
-      authorEmail: currentUser?.email || 'alex@example.com',
+      authorEmail: currentUser?.email || 'shavitdaloutra28@gmail.com',
     });
 
     showToast(`Post submitted for managerial review!`, 'info');
@@ -146,7 +146,7 @@ export function PostComposer({
     const res = postService.schedulePost({
       content,
       platform,
-      authorEmail: currentUser?.email || 'alex@example.com',
+      authorEmail: currentUser?.email || 'shavitdaloutra28@gmail.com',
       scheduledAt,
     });
 
@@ -436,7 +436,7 @@ export function PostComposer({
         <PostPreview
           platform={platform}
           content={content}
-          authorName={currentUser?.name || 'Alex Morgan'}
+          authorName={currentUser?.name || 'Shavit Daloutra'}
           mediaUrl={attachedMedia?.Url || null}
         />
       </div>

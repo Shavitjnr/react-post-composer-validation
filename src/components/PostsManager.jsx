@@ -26,7 +26,7 @@ export function PostsManager({ onNavigateToComposer, showToast }) {
   };
 
   const handleApprove = (post) => {
-    postService.approvePost(post.ID, 'alex@example.com');
+    postService.approvePost(post.ID, 'shavitdaloutra28@gmail.com');
     refreshList();
     showToast(`Post for ${post.Platform} approved and queued!`, 'success');
   };
@@ -34,7 +34,7 @@ export function PostsManager({ onNavigateToComposer, showToast }) {
   const handleRequestChanges = (post) => {
     const reason = prompt('Enter editorial feedback / changes requested:');
     if (reason && reason.trim()) {
-      postService.rejectPost(post.ID, 'alex@example.com', reason.trim());
+      postService.rejectPost(post.ID, 'shavitdaloutra28@gmail.com', reason.trim());
       refreshList();
       showToast('Changes requested; returned to draft', 'info');
     }

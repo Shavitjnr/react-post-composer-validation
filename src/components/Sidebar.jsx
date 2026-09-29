@@ -233,11 +233,11 @@ export function Sidebar({
       {/* User Footer Profile */}
       <div className="sidebar-user-footer">
         <div className="user-avatar-circle">
-          {currentUser?.name?.slice(0, 2).toUpperCase() || 'AM'}
+          {currentUser?.name?.slice(0, 2).toUpperCase() || 'SD'}
         </div>
         <div className="user-details-text">
-          <span className="user-display-name">{currentUser?.name || 'Alex Morgan'}</span>
-          <span className="user-email-caption">{currentUser?.email || 'alex@example.com'}</span>
+          <span className="user-display-name">{currentUser?.name || 'Shavit Daloutra'}</span>
+          <span className="user-email-caption">{currentUser?.email || 'shavitdaloutra28@gmail.com'}</span>
         </div>
         <button
           type="button"

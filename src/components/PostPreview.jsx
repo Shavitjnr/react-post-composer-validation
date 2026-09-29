@@ -15,7 +15,7 @@ import {
   Play
 } from 'lucide-react';
 
-export function PostPreview({ platform, content, authorName = 'Alex Morgan', mediaUrl = null }) {
+export function PostPreview({ platform, content, authorName = 'Shavit Daloutra', mediaUrl = null }) {
   const displayContent = content.trim() || 'Your live post preview will render here in real-time as you type in the editor.';
 
   const renderFormattedText = (text) => {

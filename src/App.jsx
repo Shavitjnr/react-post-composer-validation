@@ -17,13 +17,24 @@ import { CsvDatabaseView } from './components/CsvDatabaseView';
 import { WorkspaceModal } from './components/WorkspaceModal';
 import { UpgradeModal } from './components/UpgradeModal';
 import { AuthModal } from './components/AuthModal';
+import { LandingPage } from './components/LandingPage';
+import { SuperAdminDashboard } from './components/SuperAdminDashboard';
 
 import { workspaceService } from './services/workspaceService';
 import { subscriptionService } from './services/subscriptionService';
 import { csvStorage } from './utils/csvStorage';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 
+const parseRouteFromLocation = () => {
+  if (typeof window === 'undefined') return 'home';
+  const p = window.location.pathname.toLowerCase();
+  if (p.startsWith('/admin')) return 'admin';
+  if (p.startsWith('/pannel') || p.startsWith('/panel')) return 'panel';
+  return 'home';
+};
+
 function App({ hasClerkConfigured = false }) {
+  const [currentRoute, setCurrentRoute] = useState(parseRouteFromLocation);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [currentUser, setCurrentUser] = useState(() => csvStorage.getActiveUser());
   const [workspaces, setWorkspaces] = useState(() => workspaceService.getAllWorkspaces());
@@ -38,6 +49,26 @@ function App({ hasClerkConfigured = false }) {
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
   };
+
+  const navigate = (newRoute) => {
+    let targetPath = '/';
+    if (newRoute === 'panel') targetPath = '/Pannel';
+    else if (newRoute === 'admin') targetPath = '/admin';
+
+    if (window.location.pathname !== targetPath) {
+      window.history.pushState({}, '', targetPath);
+    }
+    setCurrentRoute(newRoute);
+    window.scrollTo(0, 0);
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentRoute(parseRouteFromLocation());
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   useEffect(() => {
     if (toast) {
@@ -63,130 +94,161 @@ function App({ hasClerkConfigured = false }) {
     showToast('Logged out of session', 'info');
   };
 
+  const handleAuthSuccess = (user) => {
+    setCurrentUser(user);
+    navigate('panel'); // Shift to /Pannel after login
+    showToast(`Logged in as ${user.name}. Welcome to Post Composer Pro!`, 'success');
+  };
+
   return (
-    <div className="saas-app-layout">
-      {/* 1. Left SaaS Collapsible Sidebar */}
-      <Sidebar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        activeWorkspace={activeWorkspace}
-        workspaces={workspaces}
-        onOpenWorkspaceModal={() => setIsWorkspaceModalOpen(true)}
-        currentUser={currentUser}
-        onLogout={handleLogout}
-        onOpenUpgradeModal={() => setIsUpgradeModalOpen(true)}
-      />
-
-      {/* 2. Main Viewport & Header */}
-      <div className="saas-main-viewport">
-        {/* Top Navbar */}
-        <TopNavbar
-          activeWorkspace={activeWorkspace}
-          onOpenWorkspaceModal={() => setIsWorkspaceModalOpen(true)}
-          onNavigate={(tab) => setActiveTab(tab)}
-          onOpenMediaUpload={() => setActiveTab('media')}
-          showToast={showToast}
-          hasClerkConfigured={hasClerkConfigured}
+    <>
+      {currentRoute === 'home' && (
+        <LandingPage
+          onNavigateToPanel={() => navigate('panel')}
+          onNavigateToAdmin={() => navigate('admin')}
+          onOpenAuth={() => setIsAuthOpen(true)}
         />
+      )}
 
-        {/* Dynamic Main Workspace Content */}
-        <main className="saas-page-content-wrapper">
-          {activeTab === 'dashboard' && (
-            <Dashboard
-              currentUser={currentUser}
+      {currentRoute === 'admin' && (
+        <SuperAdminDashboard
+          onNavigateToPanel={() => navigate('panel')}
+          onNavigateToHome={() => navigate('home')}
+          onImpersonateSuccess={(user) => {
+            setCurrentUser(user);
+          }}
+          showToast={showToast}
+        />
+      )}
+
+      {currentRoute === 'panel' && (
+        <div className="saas-app-layout">
+          {/* 1. Left SaaS Collapsible Sidebar */}
+          <Sidebar
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            activeWorkspace={activeWorkspace}
+            workspaces={workspaces}
+            onOpenWorkspaceModal={() => setIsWorkspaceModalOpen(true)}
+            currentUser={currentUser}
+            onLogout={handleLogout}
+            onOpenUpgradeModal={() => setIsUpgradeModalOpen(true)}
+          />
+
+          {/* 2. Main Viewport & Header */}
+          <div className="saas-main-viewport">
+            {/* Top Navbar */}
+            <TopNavbar
               activeWorkspace={activeWorkspace}
-              onNavigateToComposer={() => setActiveTab('composer')}
-              onNavigateToTab={(tab) => setActiveTab(tab)}
+              onOpenWorkspaceModal={() => setIsWorkspaceModalOpen(true)}
+              onNavigate={(tab) => setActiveTab(tab)}
+              onOpenMediaUpload={() => setActiveTab('media')}
               showToast={showToast}
+              hasClerkConfigured={hasClerkConfigured}
+              onNavigateToHome={() => navigate('home')}
+              onNavigateToAdmin={() => navigate('admin')}
             />
-          )}
 
-          {activeTab === 'composer' && (
-            <PostComposer
-              currentUser={currentUser}
-              activeWorkspace={activeWorkspace}
-              showToast={showToast}
-              onPostCreated={() => {}}
-              onDraftSaved={() => {}}
-            />
-          )}
+            {/* Dynamic Main Workspace Content */}
+            <main className="saas-page-content-wrapper">
+              {activeTab === 'dashboard' && (
+                <Dashboard
+                  currentUser={currentUser}
+                  activeWorkspace={activeWorkspace}
+                  onNavigateToComposer={() => setActiveTab('composer')}
+                  onNavigateToTab={(tab) => setActiveTab(tab)}
+                  showToast={showToast}
+                />
+              )}
 
-          {activeTab === 'calendar' && (
-            <CalendarView
-              onNavigateToComposer={() => setActiveTab('composer')}
-              showToast={showToast}
-            />
-          )}
+              {activeTab === 'composer' && (
+                <PostComposer
+                  currentUser={currentUser}
+                  activeWorkspace={activeWorkspace}
+                  showToast={showToast}
+                  onPostCreated={() => {}}
+                  onDraftSaved={() => {}}
+                />
+              )}
 
-          {activeTab === 'posts' && (
-            <PostsManager
-              onNavigateToComposer={() => setActiveTab('composer')}
-              showToast={showToast}
-            />
-          )}
+              {activeTab === 'calendar' && (
+                <CalendarView
+                  onNavigateToComposer={() => setActiveTab('composer')}
+                  showToast={showToast}
+                />
+              )}
 
-          {activeTab === 'drafts' && (
-            <DraftsManager
-              onOpenComposerWithContent={(content, platform) => {
-                setActiveTab('composer');
-              }}
-              onNavigateToComposer={() => setActiveTab('composer')}
-              showToast={showToast}
-            />
-          )}
+              {activeTab === 'posts' && (
+                <PostsManager
+                  onNavigateToComposer={() => setActiveTab('composer')}
+                  showToast={showToast}
+                />
+              )}
 
-          {activeTab === 'media' && (
-            <MediaLibrary
-              onNavigateToComposer={() => setActiveTab('composer')}
-              showToast={showToast}
-            />
-          )}
+              {activeTab === 'drafts' && (
+                <DraftsManager
+                  onOpenComposerWithContent={(content, platform) => {
+                    setActiveTab('composer');
+                  }}
+                  onNavigateToComposer={() => setActiveTab('composer')}
+                  showToast={showToast}
+                />
+              )}
 
-          {activeTab === 'social' && (
-            <SocialAccountsManager
-              activeWorkspace={activeWorkspace}
-              showToast={showToast}
-            />
-          )}
+              {activeTab === 'media' && (
+                <MediaLibrary
+                  onNavigateToComposer={() => setActiveTab('composer')}
+                  showToast={showToast}
+                />
+              )}
 
-          {activeTab === 'campaigns' && (
-            <CampaignsManager
-              showToast={showToast}
-            />
-          )}
+              {activeTab === 'social' && (
+                <SocialAccountsManager
+                  activeWorkspace={activeWorkspace}
+                  showToast={showToast}
+                />
+              )}
 
-          {activeTab === 'analytics' && (
-            <AnalyticsView />
-          )}
+              {activeTab === 'campaigns' && (
+                <CampaignsManager
+                  showToast={showToast}
+                />
+              )}
 
-          {activeTab === 'team' && (
-            <TeamManager
-              showToast={showToast}
-            />
-          )}
+              {activeTab === 'analytics' && (
+                <AnalyticsView />
+              )}
 
-          {activeTab === 'billing' && (
-            <BillingView
-              activeWorkspace={activeWorkspace}
-              showToast={showToast}
-            />
-          )}
+              {activeTab === 'team' && (
+                <TeamManager
+                  showToast={showToast}
+                />
+              )}
 
-          {activeTab === 'audit' && (
-            <AuditLogView
-              showToast={showToast}
-            />
-          )}
+              {activeTab === 'billing' && (
+                <BillingView
+                  activeWorkspace={activeWorkspace}
+                  showToast={showToast}
+                />
+              )}
 
-          {activeTab === 'csv' && (
-            <CsvDatabaseView
-              showToast={showToast}
-            />
-          )}
-        </main>
-      </div>
+              {activeTab === 'audit' && (
+                <AuditLogView
+                  showToast={showToast}
+                />
+              )}
 
-      {/* MODALS */}
+              {activeTab === 'csv' && (
+                <CsvDatabaseView
+                  showToast={showToast}
+                />
+              )}
+            </main>
+          </div>
+        </div>
+      )}
+
+      {/* Universal MODALS */}
       <WorkspaceModal
         isOpen={isWorkspaceModalOpen}
         onClose={() => setIsWorkspaceModalOpen(false)}
@@ -210,7 +272,7 @@ function App({ hasClerkConfigured = false }) {
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
-        onAuthSuccess={(user) => setCurrentUser(user)}
+        onAuthSuccess={handleAuthSuccess}
         showToast={showToast}
       />
 
@@ -232,7 +294,7 @@ function App({ hasClerkConfigured = false }) {
           </button>
         </div>
       )}
-    </div>
+    </>
   );
 }
 

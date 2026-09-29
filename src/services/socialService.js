@@ -62,7 +62,7 @@ export const socialService = {
     };
 
     csvRepository.saveSocialAccount(accountRecord);
-    csvRepository.logAction(wsId, 'alex@example.com', 'CONNECT_CHANNEL', accountRecord.ID, `Connected ${platform} (${accountRecord.Username})`);
+    csvRepository.logAction(wsId, 'shavitdaloutra28@gmail.com', 'CONNECT_CHANNEL', accountRecord.ID, `Connected ${platform} (${accountRecord.Username})`);
     notificationService.notify(
       wsId,
       'Social Channel Connected',
@@ -81,7 +81,7 @@ export const socialService = {
   disconnectAccount: (accountId) => {
     const wsId = workspaceService.getActiveWorkspaceId();
     csvRepository.removeSocialAccount(accountId);
-    csvRepository.logAction(wsId, 'alex@example.com', 'DISCONNECT_CHANNEL', accountId, 'Disconnected channel');
+    csvRepository.logAction(wsId, 'shavitdaloutra28@gmail.com', 'DISCONNECT_CHANNEL', accountId, 'Disconnected channel');
     notificationService.notify(
       wsId,
       'Channel Disconnected',

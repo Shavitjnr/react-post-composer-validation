@@ -80,7 +80,7 @@ export const subscriptionService = {
       ).join('\r\n'));
     }
 
-    csvRepository.logAction(activeWs.ID, 'alex@example.com', 'UPGRADE_PLAN', activeWs.ID, `Switched workspace plan to ${targetPlan.name}`);
+    csvRepository.logAction(activeWs.ID, 'shavitdaloutra28@gmail.com', 'UPGRADE_PLAN', activeWs.ID, `Switched workspace plan to ${targetPlan.name}`);
     notificationService.notify(
       activeWs.ID,
       'Subscription Updated',

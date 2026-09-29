@@ -44,7 +44,7 @@ export const mediaService = {
     };
 
     csvRepository.saveMedia(newMedia);
-    csvRepository.logAction(wsId, 'alex@example.com', 'UPLOAD_MEDIA', newMedia.ID, `Uploaded ${newMedia.Title} (${newMedia.SizeMB} MB)`);
+    csvRepository.logAction(wsId, 'shavitdaloutra28@gmail.com', 'UPLOAD_MEDIA', newMedia.ID, `Uploaded ${newMedia.Title} (${newMedia.SizeMB} MB)`);
 
     return { success: true, media: newMedia };
   },
@@ -52,7 +52,7 @@ export const mediaService = {
   deleteMedia: (id) => {
     const wsId = workspaceService.getActiveWorkspaceId();
     csvRepository.deleteMedia(id);
-    csvRepository.logAction(wsId, 'alex@example.com', 'DELETE_MEDIA', id, 'Deleted media asset');
+    csvRepository.logAction(wsId, 'shavitdaloutra28@gmail.com', 'DELETE_MEDIA', id, 'Deleted media asset');
     return { success: true };
   },
 };

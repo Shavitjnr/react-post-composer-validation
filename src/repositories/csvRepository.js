@@ -24,7 +24,7 @@ acc_2,"ws_1","LinkedIn","@hostego-inc","Hostego Inc.","Connected","14890","AQW7�
 acc_3,"ws_1","Instagram","@hostego_official","Hostego Brand","Connected","24500","EAAJ••••••••1823","2026-09-29 09:20:00"
 acc_4,"ws_1","Facebook","@hostego.technologies","Hostego Page","Connected","18200","EAAK••••••••3912","2026-09-29 09:25:00"
 acc_5,"ws_1","YouTube","@HostegoMedia","Hostego Media Official","Connected","52400","ya29••••••••0918","2026-09-29 09:30:00"
-acc_6,"ws_2","Twitter","@alexmorgan_dev","Alex Morgan","Connected","8400","4B71••••••••1928","2026-09-29 10:00:00"`;
+acc_6,"ws_2","Twitter","@shavitdaloutra","Shavit Daloutra","Connected","8400","4B71••••••••1928","2026-09-29 10:00:00"`;
 
 // Initial Campaigns CSV
 export const DEFAULT_CAMPAIGNS_CSV = `ID,WorkspaceId,Name,Description,Status,StartDate,EndDate,Platforms,Tags
@@ -41,10 +41,10 @@ med_4,"ws_1","Product Demo Teaser Clip","video","14.5","https://images.unsplash.
 
 // Initial Audit Logs CSV
 export const DEFAULT_AUDIT_LOGS_CSV = `ID,WorkspaceId,UserEmail,Action,Resource,Timestamp,Details
-aud_1,"ws_1","alex@example.com","CREATE_POST","post_1","2026-09-29 09:30:00","Created initial corporate announcement post"
-aud_2,"ws_1","alex@example.com","SCHEDULE_POST","post_3","2026-09-29 09:45:00","Scheduled technical seminar for 2026-10-01"
+aud_1,"ws_1","shavitdaloutra28@gmail.com","CREATE_POST","post_1","2026-09-29 09:30:00","Created initial corporate announcement post"
+aud_2,"ws_1","shavitdaloutra28@gmail.com","SCHEDULE_POST","post_3","2026-09-29 09:45:00","Scheduled technical seminar for 2026-10-01"
 aud_3,"ws_1","sarah@tech.org","CONNECT_ACCOUNT","acc_3","2026-09-29 10:12:00","Connected Instagram Business account in Demo Mode"
-aud_4,"ws_1","alex@example.com","APPROVE_POST","post_4","2026-09-29 10:30:00","Approved senior architect hiring announcement"`;
+aud_4,"ws_1","shavitdaloutra28@gmail.com","APPROVE_POST","post_4","2026-09-29 10:30:00","Approved senior architect hiring announcement"`;
 
 export const csvRepository = {
   // WORKSPACES
@@ -172,7 +172,7 @@ export const csvRepository = {
     const newLog = {
       ID: `aud_${Date.now()}`,
       WorkspaceId: workspaceId || 'ws_1',
-      UserEmail: userEmail || 'alex@example.com',
+      UserEmail: userEmail || 'shavitdaloutra28@gmail.com',
       Action: action,
       Resource: resource,
       Timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19),
