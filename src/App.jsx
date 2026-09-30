@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { TopNavbar } from './components/TopNavbar';
 import { Dashboard } from './components/Dashboard';
@@ -53,6 +53,10 @@ function App({ hasClerkConfigured = false }) {
   const [selectedCheckoutPlan, setSelectedCheckoutPlan] = useState(null);
   const [toast, setToast] = useState(null);
 
+  // Clerk auth handlers ref
+  const clerkHandlersRef = useRef(null);
+  const prevClerkSignedInRef = useRef(false);
+
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
   };
@@ -85,6 +89,7 @@ function App({ hasClerkConfigured = false }) {
   }, [toast]);
 
   const [clerkState, setClerkState] = useState({
+    isLoaded: false,
     isSignedIn: false,
     user: null,
     signOut: null
@@ -97,15 +102,53 @@ function App({ hasClerkConfigured = false }) {
     effectiveUser?.orgId || clerkState.user?.orgId
   );
 
+  // Sync Clerk authentication state changes to user session & automatic routing
+  useEffect(() => {
+    if (clerkState.isSignedIn && clerkState.user) {
+      if (!prevClerkSignedInRef.current) {
+        prevClerkSignedInRef.current = true;
+        const isSuper = adminService.isSuperAdmin(
+          clerkState.user,
+          clerkState.user?.orgId
+        );
+
+        // Sync with local session store for CSV & workspace compatibility
+        csvStorage.setActiveUser({
+          id: clerkState.user.id,
+          name: clerkState.user.name,
+          email: clerkState.user.email,
+          role: isSuper ? 'Super Admin' : 'Member'
+        });
+
+        if (isSuper) {
+          navigate('admin');
+          showToast(`Super Admin authenticated: Welcome ${clerkState.user.name}`, 'success');
+        } else {
+          navigate('panel');
+          showToast(`Welcome back, ${clerkState.user.name}! Workspace ready.`, 'success');
+        }
+      }
+    } else {
+      prevClerkSignedInRef.current = false;
+    }
+  }, [clerkState.isSignedIn, clerkState.user]);
+
   // STRICT URL PROTECTION: Nobody can view /Pannel without logging in / signing up first!
   useEffect(() => {
+    // If Clerk is still loading, wait before evaluating route protection
+    if (hasClerkConfigured && !clerkState.isLoaded) return;
+
     if (currentRoute === 'panel' && !effectiveUser) {
       navigate('home');
-      setAuthInitialMode('signup');
-      setIsAuthOpen(true);
       showToast('Authentication required: Please sign up or log in to access your workspace panel.', 'info');
+      if (hasClerkConfigured && clerkHandlersRef.current?.openSignUp) {
+        clerkHandlersRef.current.openSignUp();
+      } else {
+        setAuthInitialMode('signup');
+        setIsAuthOpen(true);
+      }
     }
-  }, [currentRoute, effectiveUser]);
+  }, [currentRoute, effectiveUser, hasClerkConfigured, clerkState.isLoaded]);
 
   const handleSelectWorkspace = (workspaceId) => {
     workspaceService.setActiveWorkspaceId(workspaceId);
@@ -144,24 +187,36 @@ function App({ hasClerkConfigured = false }) {
     }
   };
 
-  // Get Started Free prompts Sign Up if not logged in, or goes to /Pannel if logged in
+  // Get Started Free triggers Clerk SignUp or opens modal
   const handleGetStartedFree = () => {
     if (effectiveUser) {
       navigate('panel');
+    } else if (hasClerkConfigured && clerkHandlersRef.current?.openSignUp) {
+      clerkHandlersRef.current.openSignUp();
     } else {
       setAuthInitialMode('signup');
       setIsAuthOpen(true);
     }
   };
 
+  // Log In triggers Clerk SignIn or opens modal
   const handleOpenLogin = () => {
-    setAuthInitialMode('login');
-    setIsAuthOpen(true);
+    if (hasClerkConfigured && clerkHandlersRef.current?.openSignIn) {
+      clerkHandlersRef.current.openSignIn();
+    } else {
+      setAuthInitialMode('login');
+      setIsAuthOpen(true);
+    }
   };
 
+  // Sign Up triggers Clerk SignUp or opens modal
   const handleOpenSignUp = () => {
-    setAuthInitialMode('signup');
-    setIsAuthOpen(true);
+    if (hasClerkConfigured && clerkHandlersRef.current?.openSignUp) {
+      clerkHandlersRef.current.openSignUp();
+    } else {
+      setAuthInitialMode('signup');
+      setIsAuthOpen(true);
+    }
   };
 
   // Transparent pricing plans trigger verified checkout flow (NEVER directly to panel)
@@ -373,12 +428,22 @@ function App({ hasClerkConfigured = false }) {
         showToast={showToast}
       />
 
+      {/* Clerk Authentication & User Bridge */}
+      <ClerkUserBridge
+        hasClerkConfigured={hasClerkConfigured}
+        onSyncClerkState={setClerkState}
+        onRegisterAuthHandlers={(handlers) => {
+          clerkHandlersRef.current = handlers;
+        }}
+      />
+
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
         onAuthSuccess={handleAuthSuccess}
         showToast={showToast}
         initialMode={authInitialMode}
+        hasClerkConfigured={hasClerkConfigured}
       />
 
       <PaymentCheckoutModal

@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { X, Lock, Mail, User, ShieldCheck, CheckCircle2, UserPlus, LogIn, ArrowRight } from 'lucide-react';
 import { csvStorage } from '../utils/csvStorage';
+import { ClerkAuthEmbed } from './ClerkAuthControls';
 
 export function AuthModal({
   isOpen,
   onClose,
   onAuthSuccess,
   showToast,
-  initialMode = 'login'
+  initialMode = 'login',
+  hasClerkConfigured = false
 }) {
   const [isSignUp, setIsSignUp] = useState(initialMode === 'signup');
   const [name, setName] = useState('');
-  const [email, setEmail] = useState('daloutrashavit@gmail.com');
-  const [password, setPassword] = useState('shavitdaloutra');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -20,14 +22,9 @@ export function AuthModal({
       const wantSignUp = initialMode === 'signup';
       setIsSignUp(wantSignUp);
       setError('');
-      if (wantSignUp) {
-        setName('');
-        setEmail('');
-        setPassword('');
-      } else {
-        setEmail('daloutrashavit@gmail.com');
-        setPassword('shavitdaloutra');
-      }
+      setName('');
+      setEmail('');
+      setPassword('');
     }
   }, [isOpen, initialMode]);
 
@@ -51,10 +48,10 @@ export function AuthModal({
         return;
       }
 
-      // Registers directly into users.csv!
+      // Registers into users database
       const res = csvStorage.registerUser(name.trim(), email.trim(), password, 'Member');
       if (res.success) {
-        showToast(`Account created for ${name}! Redirecting to workspace...`, 'success');
+        showToast(`Account created for ${name}! Opening workspace...`, 'success');
         onAuthSuccess(res.user);
         onClose();
       } else {
@@ -66,7 +63,7 @@ export function AuthModal({
         return;
       }
 
-      // Authenticates by checking email and password in users.csv!
+      // Authenticates with database
       const res = csvStorage.authenticateUser(email.trim(), password);
       if (res.success) {
         showToast(`Welcome back, ${res.user.name}!`, 'success');
@@ -76,13 +73,6 @@ export function AuthModal({
         setError(res.error || 'Invalid email or password.');
       }
     }
-  };
-
-  const handleFillDemo = (demoEmail, demoPass) => {
-    setEmail(demoEmail);
-    setPassword(demoPass);
-    setIsSignUp(false);
-    setError('');
   };
 
   return (
@@ -112,8 +102,6 @@ export function AuthModal({
             onClick={() => {
               setIsSignUp(false);
               setError('');
-              if (!email) setEmail('daloutrashavit@gmail.com');
-              if (!password) setPassword('shavitdaloutra');
             }}
             className={`auth-segment-tab ${!isSignUp ? 'active' : ''}`}
           >
@@ -133,135 +121,121 @@ export function AuthModal({
           </button>
         </div>
 
-        {/* Demo Fast Log In Shortcuts (Only in Login Mode) */}
-        {!isSignUp && (
-          <div className="demo-accounts-box">
-            <span className="demo-label">Quick Demo 1-Click Access:</span>
-            <div className="demo-pills">
-              <button
-                type="button"
-                onClick={() => handleFillDemo('daloutrashavit@gmail.com', 'shavitdaloutra')}
-                className={`demo-pill ${email === 'daloutrashavit@gmail.com' ? 'active-pill' : ''}`}
-              >
-                👑 Super Admin (daloutrashavit@gmail.com)
-              </button>
-              <button
-                type="button"
-                onClick={() => handleFillDemo('sarah@tech.org', 'sarahSecure#2026')}
-                className={`demo-pill ${email === 'sarah@tech.org' ? 'active-pill' : ''}`}
-              >
-                👤 Normal User (sarah@tech.org)
-              </button>
-            </div>
-          </div>
-        )}
-
         {isSignUp && (
           <div className="signup-benefit-banner">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-            <span>Create a free account to unlock your personal workspace panel, multi-channel post composer, and calendar scheduling.</span>
+            <span>Create your account to unlock your personal workspace panel, multi-channel post composer, and campaign scheduling.</span>
           </div>
         )}
 
         {error && <div className="modal-error-banner">{error}</div>}
 
-        {/* Authentication Form */}
-        <form onSubmit={handleSubmit} className="auth-form">
-          {isSignUp && (
-            <div className="form-field">
-              <label className="field-label">Full Name</label>
-              <div className="input-with-icon">
-                <User className="input-icon" />
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. John Doe"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="modal-input"
-                  autoFocus
-                />
+        {/* If Clerk is configured, show Clerk authentication embed */}
+        {hasClerkConfigured ? (
+          <div className="clerk-auth-container-shell">
+            <ClerkAuthEmbed isSignUp={isSignUp} />
+          </div>
+        ) : (
+          /* Standard Clean Fallback Form (Zero exposed credentials) */
+          <>
+            <form onSubmit={handleSubmit} className="auth-form">
+              {isSignUp && (
+                <div className="form-field">
+                  <label className="field-label">Full Name</label>
+                  <div className="input-with-icon">
+                    <User className="input-icon" />
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. John Doe"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="modal-input"
+                      autoFocus
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="form-field">
+                <label className="field-label">Email Address</label>
+                <div className="input-with-icon">
+                  <Mail className="input-icon" />
+                  <input
+                    type="email"
+                    required
+                    placeholder="name@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="modal-input"
+                  />
+                </div>
               </div>
-            </div>
-          )}
 
-          <div className="form-field">
-            <label className="field-label">Email Address</label>
-            <div className="input-with-icon">
-              <Mail className="input-icon" />
-              <input
-                type="email"
-                required
-                placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="modal-input"
-              />
-            </div>
-          </div>
+              <div className="form-field">
+                <label className="field-label">
+                  Password {isSignUp ? '(Min 6 characters)' : ''}
+                </label>
+                <div className="input-with-icon">
+                  <Lock className="input-icon" />
+                  <input
+                    type="password"
+                    required
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="modal-input"
+                  />
+                </div>
+              </div>
 
-          <div className="form-field">
-            <label className="field-label">
-              Password {isSignUp ? '(Min 6 characters)' : ''}
-            </label>
-            <div className="input-with-icon">
-              <Lock className="input-icon" />
-              <input
-                type="password"
-                required
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="modal-input"
-              />
-            </div>
-          </div>
+              <p className="csv-storage-note">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Secure account authentication enabled</span>
+              </p>
 
-          <p className="csv-storage-note">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Safe offline storage synced with <code>data/users.csv</code></span>
-          </p>
-
-          <button type="submit" className="btn-modal-submit">
-            <span>
-              {isSignUp ? 'Create Free Account & Go to Panel' : 'Log In & Open Panel'}
-            </span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </form>
-
-        {/* Bottom Switcher */}
-        <div className="modal-toggle-row">
-          {isSignUp ? (
-            <span>
-              Already have an account?{' '}
-              <button
-                type="button"
-                onClick={() => {
-                  setIsSignUp(false);
-                  setError('');
-                }}
-                className="link-toggle"
-              >
-                Log In here
+              <button type="submit" className="btn-modal-submit">
+                <span>
+                  {isSignUp ? 'Create Free Account & Go to Panel' : 'Log In & Open Panel'}
+                </span>
+                <ArrowRight className="w-4 h-4" />
               </button>
-            </span>
-          ) : (
-            <span>
-              Don't have an account yet?{' '}
-              <button
-                type="button"
-                onClick={() => {
-                  setIsSignUp(true);
-                  setError('');
-                }}
-                className="link-toggle"
-              >
-                Sign Up for free
-              </button>
-            </span>
-          )}
-        </div>
+            </form>
+
+            {/* Bottom Switcher */}
+            <div className="modal-toggle-row">
+              {isSignUp ? (
+                <span>
+                  Already have an account?{' '}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSignUp(false);
+                      setError('');
+                    }}
+                    className="link-toggle"
+                  >
+                    Log In here
+                  </button>
+                </span>
+              ) : (
+                <span>
+                  Don't have an account yet?{' '}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSignUp(true);
+                      setError('');
+                    }}
+                    className="link-toggle"
+                  >
+                    Sign Up for free
+                  </button>
+                </span>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

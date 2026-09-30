@@ -2079,6 +2079,20 @@ body {
   margin-bottom: 14px;
 }
 
+.clerk-auth-container-shell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0;
+  width: 100%;
+}
+
+.clerk-embedded-auth-card {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
 .auth-form,
 .schedule-form {
   display: flex;

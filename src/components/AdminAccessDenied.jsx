@@ -37,10 +37,8 @@ export function AdminAccessDenied({
         <h1 className="denied-title">Super Admin Authority Required</h1>
 
         <p className="denied-description">
-          The Post Composer Pro <strong>Master Command Center (`/admin`)</strong> is strictly restricted to
-          platform root administrators: <br />
-          <code className="admin-email-tag">daloutrashavit@gmail.com</code> •{' '}
-          <code className="admin-org-tag">org_3JzmVi9pR3cE8KEwBWeAAqBmTAK</code>
+          The Personal Brand <strong>Master Command Center (`/admin`)</strong> is strictly restricted to
+          platform root administrators with verified master authority.
         </p>
 
         {/* Current Active Account Profile Card */}
@@ -78,18 +76,6 @@ export function AdminAccessDenied({
 
         {/* Action Buttons */}
         <div className="denied-actions-row">
-          {onAuthenticateAsSuperAdmin && (
-            <button
-              type="button"
-              onClick={onAuthenticateAsSuperAdmin}
-              className="btn-denied-primary"
-              style={{ backgroundColor: '#b45309', borderColor: '#b45309', color: '#ffffff' }}
-              title="Authenticate immediately as Shavit Daloutra (Super Admin)"
-            >
-              <ShieldCheck className="w-4 h-4 text-amber-300" />
-              <span>Log In as Super Admin (Shavit Daloutra)</span>
-            </button>
-          )}
 
           <button
             type="button"

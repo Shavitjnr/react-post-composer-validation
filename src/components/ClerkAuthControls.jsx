@@ -6,7 +6,9 @@ import {
   SignUpButton,
   UserButton,
   useUser,
-  useClerk
+  useClerk,
+  SignIn,
+  SignUp
 } from '@clerk/clerk-react';
 import { ShieldCheck, LogIn, UserPlus, LogOut } from 'lucide-react';
 
@@ -82,16 +84,64 @@ function ClerkUserProfile() {
 }
 
 /**
- * ClerkUserBridge: Syncs active Clerk user and organization ID up to App state
+ * ClerkAuthEmbed: Embedded official Clerk SignIn and SignUp component
  */
-export function ClerkUserBridge({ hasClerkConfigured, onSyncClerkState }) {
-  if (!hasClerkConfigured) return null;
-  return <ClerkBridgeInternal onSyncClerkState={onSyncClerkState} />;
+export function ClerkAuthEmbed({ isSignUp }) {
+  return (
+    <div className="clerk-embedded-auth-card">
+      {isSignUp ? (
+        <SignUp
+          routing="hash"
+          appearance={{
+            elements: {
+              card: 'border-0 shadow-none bg-transparent',
+              rootBox: 'w-full'
+            }
+          }}
+        />
+      ) : (
+        <SignIn
+          routing="hash"
+          appearance={{
+            elements: {
+              card: 'border-0 shadow-none bg-transparent',
+              rootBox: 'w-full'
+            }
+          }}
+        />
+      )}
+    </div>
+  );
 }
 
-function ClerkBridgeInternal({ onSyncClerkState }) {
+/**
+ * ClerkUserBridge: Syncs active Clerk user, organization ID, and modal triggers to App
+ */
+export function ClerkUserBridge({ hasClerkConfigured, onSyncClerkState, onRegisterAuthHandlers }) {
+  if (!hasClerkConfigured) return null;
+  return (
+    <ClerkBridgeInternal
+      onSyncClerkState={onSyncClerkState}
+      onRegisterAuthHandlers={onRegisterAuthHandlers}
+    />
+  );
+}
+
+function ClerkBridgeInternal({ onSyncClerkState, onRegisterAuthHandlers }) {
   const { user, isLoaded, isSignedIn } = useUser();
-  const { signOut } = useClerk();
+  const clerk = useClerk();
+
+  useEffect(() => {
+    if (onRegisterAuthHandlers && clerk) {
+      onRegisterAuthHandlers({
+        openSignIn: (opts) => clerk.openSignIn(opts),
+        openSignUp: (opts) => clerk.openSignUp(opts),
+        closeSignIn: () => clerk.closeSignIn?.(),
+        closeSignUp: () => clerk.closeSignUp?.(),
+        signOut: () => clerk.signOut()
+      });
+    }
+  }, [clerk, onRegisterAuthHandlers]);
 
   useEffect(() => {
     if (isLoaded) {
@@ -100,10 +150,11 @@ function ClerkBridgeInternal({ onSyncClerkState }) {
         const orgMemberships = user.organizationMemberships || [];
         const primaryEmail = user.primaryEmailAddress?.emailAddress || '';
         onSyncClerkState({
+          isLoaded: true,
           isSignedIn: true,
           user: {
             id: user.id,
-            name: user.fullName || user.username || primaryEmail.split('@')[0] || 'Clerk User',
+            name: user.fullName || user.username || primaryEmail.split('@')[0] || 'Personal Brand User',
             email: primaryEmail,
             username: user.username || '',
             organizationMemberships: orgMemberships,
@@ -111,18 +162,20 @@ function ClerkBridgeInternal({ onSyncClerkState }) {
             primaryEmailAddress: user.primaryEmailAddress,
             emailAddresses: user.emailAddresses || []
           },
-          signOut: () => signOut()
+          signOut: () => clerk.signOut()
         });
       } else {
         onSyncClerkState({
+          isLoaded: true,
           isSignedIn: false,
           user: null,
-          signOut: () => signOut()
+          signOut: () => clerk.signOut()
         });
       }
     }
-  }, [isLoaded, isSignedIn, user]);
+  }, [isLoaded, isSignedIn, user, onSyncClerkState, clerk]);
 
   return null;
 }
+
 
